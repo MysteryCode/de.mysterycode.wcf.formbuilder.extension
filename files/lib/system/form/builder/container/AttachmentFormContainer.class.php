@@ -35,6 +35,15 @@ class AttachmentFormContainer extends FormContainer {
 	protected $fieldId;
 	
 	/**
+	 * @inheritDoc
+	 */
+	public function __construct() {
+		parent::__construct();
+		
+		$this->label('wcf.attachment.attachments');
+	}
+	
+	/**
 	 * Sets the attachment-related data used to create an `AttachmentHandler` object for the
 	 * attachment form field. If no attachment data is set, attachments are not supported.
 	 *
