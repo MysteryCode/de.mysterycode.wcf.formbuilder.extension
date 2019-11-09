@@ -134,4 +134,12 @@ class AttachmentFormField extends AbstractFormField {
 			}
 		}
 	}
+	
+	/**
+	 * Dummy method in order to be able to use the wysiwyg attachment template
+	 * @return string
+	 */
+	public function getPrefixedWysiwygId() {
+		return '';
+	}
 }
