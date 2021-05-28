@@ -13,8 +13,12 @@
 	</compatibility>
 
 	<requiredpackages>
-		<requiredpackage minversion="5.2.0 Beta 2"><![CDATA[com.woltlab.wcf]]></requiredpackage>
+		<requiredpackage minversion="5.2.9"><![CDATA[com.woltlab.wcf]]></requiredpackage>
 	</requiredpackages>
+
+	<excludedpackages>
+		<excludedpackage version="5.4.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></excludedpackage>
+	</excludedpackages>
 
 	<authorinformation>
 		<author><![CDATA[Florian Gail]]></author>
@@ -22,10 +26,14 @@
 	</authorinformation>
 
 	<instructions type="install">
+		<instruction type="acpTemplate" />
+		<instruction type="template" />
 		<instruction type="file" />
 	</instructions>
 
 	<instructions type="update" fromversion="1.0.0 Alpha *">
+		<instruction type="acpTemplate" />
+		<instruction type="template" />
 		<instruction type="file" />
 	</instructions>
 </package>
