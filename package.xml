@@ -4,8 +4,8 @@
 		<packagename><![CDATA[Form Builder: Extension]]></packagename>
 		<packagedescription><![CDATA[Extension for the form builder API provided by WoltLab Suite Core 5.2+]]></packagedescription>
 
-		<version><![CDATA[1.0.0 Alpha 1]]></version>
-		<date><![CDATA[2019-11-09]]></date>
+		<version><![CDATA[1.0.0 Beta 1]]></version>
+		<date><![CDATA[2021-06-10]]></date>
 	</packageinformation>
 
 	<compatibility>
