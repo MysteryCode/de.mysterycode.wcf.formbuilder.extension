@@ -3,13 +3,13 @@
 namespace wcf\system\form\builder\data\processor;
 
 use wcf\data\IStorableObject;
-use wcf\system\form\builder\container\DummyFormContainer;
+use wcf\system\form\builder\container\MCDummyFormContainer;
 use wcf\system\form\builder\container\IFormContainer;
 use wcf\system\form\builder\field\IFormField;
 use wcf\system\form\builder\IFormDocument;
 use wcf\system\form\builder\IFormNode;
 
-class PrefixedFormDataProcessor extends AbstractFormDataProcessor {
+class MCPrefixedFormDataProcessor extends AbstractFormDataProcessor {
 	/**
 	 * processor id primarily used for error messages
 	 * @var	string
@@ -49,7 +49,7 @@ class PrefixedFormDataProcessor extends AbstractFormDataProcessor {
 	 * @inheritDoc
 	 */
 	public function processFormData(IFormDocument $document, array $parameters) {
-		/** @var DummyFormContainer $container */
+		/** @var MCDummyFormContainer $container */
 		$container = $document->getNodeById($this->id);
 		if ($container === null || !$container->hasChildren()) {
 			return $parameters;
@@ -88,7 +88,7 @@ class PrefixedFormDataProcessor extends AbstractFormDataProcessor {
 	 * @inheritDoc
 	 */
 	public function processObjectData(IFormDocument $document, array $data, IStorableObject $object) {
-		/** @var DummyFormContainer $container */
+		/** @var MCDummyFormContainer $container */
 		$container = $document->getNodeById($this->id);
 		
 		$container = $document->getNodeById($this->id);

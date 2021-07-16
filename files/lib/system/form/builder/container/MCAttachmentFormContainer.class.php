@@ -6,12 +6,13 @@ use wcf\data\IStorableObject;
 use wcf\data\object\type\ObjectTypeCache;
 use wcf\system\attachment\AttachmentHandler;
 use wcf\system\event\EventHandler;
-use wcf\system\form\builder\field\AttachmentFormField;
+use wcf\system\form\builder\field\MCAttachmentFormField;
 
-class AttachmentFormContainer extends FormContainer {
+class MCAttachmentFormContainer extends FormContainer {
 	/**
 	 * attachment form field
-	 * @var	AttachmentFormField
+	 *
+	 * @var        MCAttachmentFormField
 	 */
 	protected $attachmentField;
 	
@@ -79,7 +80,7 @@ class AttachmentFormContainer extends FormContainer {
 	/**
 	 * Returns the form field handling attachments.
 	 *
-	 * @return	AttachmentFormField
+	 * @return        MCAttachmentFormField
 	 * @throws	\BadMethodCallException		if the form field container has not been populated yet/form has not been built yet
 	 */
 	public function getAttachmentField() {
@@ -135,7 +136,7 @@ class AttachmentFormContainer extends FormContainer {
 	public function populate() {
 		parent::populate();
 		
-		$this->attachmentField = AttachmentFormField::create($this->fieldId);
+		$this->attachmentField = MCAttachmentFormField::create($this->fieldId);
 		
 		$this->appendChildren([
 			$this->attachmentField

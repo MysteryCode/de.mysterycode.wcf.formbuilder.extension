@@ -2,7 +2,7 @@
 
 namespace wcf\system\form\builder\container;
 
-class RegisterFormContainer extends FormContainer {
+class MCRegisterFormContainer extends FormContainer {
 	/**
 	 * @inheritDoc
 	 */

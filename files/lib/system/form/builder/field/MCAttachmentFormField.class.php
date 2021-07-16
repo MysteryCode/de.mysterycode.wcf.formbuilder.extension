@@ -8,7 +8,7 @@ use wcf\system\form\builder\IFormDocument;
 use wcf\system\WCF;
 use wcf\util\StringUtil;
 
-class AttachmentFormField extends AbstractFormField {
+class MCAttachmentFormField extends AbstractFormField {
 	/**
 	 * attachment handler
 	 * @var	null|AttachmentHandler

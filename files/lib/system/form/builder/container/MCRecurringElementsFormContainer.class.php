@@ -5,7 +5,7 @@ namespace wcf\system\form\builder\container;
 use wcf\system\form\builder\data\processor\CustomFormDataProcessor;
 use wcf\system\form\builder\IFormDocument;
 
-class RecurringElementsFormContainer extends FormContainer {
+class MCRecurringElementsFormContainer extends FormContainer {
 	/**
 	 * @inheritDoc
 	 */

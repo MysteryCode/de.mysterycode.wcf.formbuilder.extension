@@ -4,7 +4,7 @@ namespace wcf\system\form\builder\container;
 
 use wcf\system\WCF;
 
-class DummyFormContainer extends FormContainer {
+class MCDummyFormContainer extends FormContainer {
 	/**
 	 * @inheritDoc
 	 */

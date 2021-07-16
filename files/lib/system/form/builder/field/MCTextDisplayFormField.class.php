@@ -10,11 +10,11 @@ namespace wcf\system\form\builder\field;
  * @package	WoltLabSuite\Core\System\Form\Builder\Field
  * @since	5.2
  */
-class TextDisplayFormField extends AbstractFormField {
+class MCTextDisplayFormField extends AbstractFormField {
 	/**
 	 * @inheritDoc
 	 */
-	protected $templateName = '__textDisplayFormField';
+	protected $templateName = '__mcTextDisplayFormField';
 	
 	/**
 	 * Displayed text

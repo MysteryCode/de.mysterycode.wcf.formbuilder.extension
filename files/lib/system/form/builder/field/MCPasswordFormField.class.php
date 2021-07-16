@@ -16,7 +16,7 @@ use wcf\util\StringUtil;
  * @package	WoltLabSuite\Core\System\Form\Builder\Field
  * @since	5.2
  */
-class PasswordFormField extends AbstractFormField implements IAutoFocusFormField, IImmutableFormField, IMaximumLengthFormField, IMinimumLengthFormField, IPlaceholderFormField {
+class MCPasswordFormField extends AbstractFormField implements IAutoFocusFormField, IImmutableFormField, IMaximumLengthFormField, IMinimumLengthFormField, IPlaceholderFormField {
 	use TAutoFocusFormField;
 	use TImmutableFormField;
 	use TMaximumLengthFormField;
@@ -31,7 +31,7 @@ class PasswordFormField extends AbstractFormField implements IAutoFocusFormField
 	/**
 	 * @inheritDoc
 	 */
-	protected $templateName = '__passwordFormField';
+	protected $templateName = '__mcPasswordFormField';
 	
 	/**
 	 * @var integer

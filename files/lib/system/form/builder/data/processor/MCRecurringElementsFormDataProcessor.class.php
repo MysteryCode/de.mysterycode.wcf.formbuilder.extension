@@ -5,7 +5,7 @@ namespace wcf\system\form\builder\data\processor;
 use wcf\data\IStorableObject;
 use wcf\system\form\builder\IFormDocument;
 
-class RecurringElementsFormDataProcessor extends AbstractFormDataProcessor {
+class MCRecurringElementsFormDataProcessor extends AbstractFormDataProcessor {
 	/**
 	 * processor id primarily used for error messages
 	 * @var	string

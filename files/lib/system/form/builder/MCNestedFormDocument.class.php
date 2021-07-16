@@ -2,7 +2,7 @@
 
 namespace wcf\system\form\builder;
 
-class NestedFormDocument extends FormDocument {
+class MCNestedFormDocument extends FormDocument {
 	/**
 	 * @inheritDoc
 	 */

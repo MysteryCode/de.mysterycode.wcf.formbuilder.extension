@@ -6,16 +6,17 @@ Sometimes you want to store some data serialzed as an array but you want to have
 The form builder introduced in WSC 5.2 is currently not able to handle this case properly, so there is some sort of workaround required. 
 
 Usage example:
+
 ```PHP
-use wcf\system\form\builder\container\DummyFormContainer;
+use wcf\system\form\builder\container\MCDummyFormContainer;
 use wcf\system\form\builder\container\FormContainer;
-use wcf\system\form\builder\data\processor\PrefixedFormDataProcessor;
-use wcf\system\form\builder\NestedFormDocument;
+use wcf\system\form\builder\data\processor\MCPrefixedFormDataProcessor;
+use wcf\system\form\builder\MCNestedFormDocument;
 use wcf\system\form\builder\field\TextFormField;
 
-$this->form = NestedFormDocument::create('DummyAdd');
+$this->form = MCNestedFormDocument::create('DummyAdd');
 $this->form->appendChildren([
-	DummyFormContainer::create('additionalData')
+	MCDummyFormContainer::create('additionalData')
         ->appendChildren([
             FormContainer::create('foo')
                 ->label('wcf.dummy.foo')
@@ -25,7 +26,7 @@ $this->form->appendChildren([
                 ])
         ])
     ]);
-$this->form->getDataHandler()->addProcessor(new PrefixedFormDataProcessor('additionalData', 'additionalData'));
+$this->form->getDataHandler()->addProcessor(new MCPrefixedFormDataProcessor('additionalData', 'additionalData'));
 ```
 
 ### Attention:

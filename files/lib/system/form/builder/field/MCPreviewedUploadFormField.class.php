@@ -16,7 +16,7 @@ use wcf\util\ImageUtil;
  * @package WoltLabSuite\Core\System\Form\Builder\Field
  * @since   5.2
  */
-class PreviewedUploadFormField extends UploadFormField {
+class MCPreviewedUploadFormField extends UploadFormField {
 	/**
 	 * @inheritDoc
 	 *
