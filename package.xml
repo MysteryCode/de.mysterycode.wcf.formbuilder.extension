@@ -3,37 +3,43 @@
 	<packageinformation>
 		<packagename><![CDATA[Form Builder: Extension]]></packagename>
 		<packagedescription><![CDATA[Extension for the form builder API provided by WoltLab Suite Core 5.2+]]></packagedescription>
-
-		<version><![CDATA[1.0.0 Beta 1]]></version>
-		<date><![CDATA[2021-06-10]]></date>
+		
+		<version><![CDATA[1.0.0]]></version>
+		<date><![CDATA[2021-07-16]]></date>
 	</packageinformation>
-
-	<compatibility>
-		<api version="2019" />
-	</compatibility>
-
+	
 	<requiredpackages>
 		<requiredpackage minversion="5.2.9"><![CDATA[com.woltlab.wcf]]></requiredpackage>
 	</requiredpackages>
-
+	
 	<excludedpackages>
-		<excludedpackage version="5.4.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></excludedpackage>
+		<excludedpackage version="5.5.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></excludedpackage>
 	</excludedpackages>
-
+	
 	<authorinformation>
 		<author><![CDATA[Florian Gail]]></author>
 		<authorurl><![CDATA[https://www.mysterycode.de]]></authorurl>
 	</authorinformation>
-
+	
 	<instructions type="install">
+		<instruction type="file" />
 		<instruction type="acpTemplate" />
 		<instruction type="template" />
-		<instruction type="file" />
 	</instructions>
-
+	
 	<instructions type="update" fromversion="1.0.0 Alpha *">
+		<instruction type="file">files_update.tar</instruction>
+		<instruction type="script" run="standalone">acp/update_de.mysterycode.wcf.formBuilder.extension.php</instruction>
+		
+		<instruction type="file" />
 		<instruction type="acpTemplate" />
 		<instruction type="template" />
+	</instructions>
+	<instructions type="update" fromversion="1.0.0 Beta *">
+		<instruction type="script" run="standalone">acp/update_de.mysterycode.wcf.formBuilder.extension.php</instruction>
+		
 		<instruction type="file" />
+		<instruction type="acpTemplate" />
+		<instruction type="template" />
 	</instructions>
 </package>
