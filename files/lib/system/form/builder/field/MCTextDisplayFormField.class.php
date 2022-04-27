@@ -21,14 +21,14 @@ class MCTextDisplayFormField extends AbstractFormField {
 	 *
 	 * @var string
 	 */
-	protected $text = '';
+	protected string $text = '';
 	
 	/**
 	 * Indicator whether field text should use HTML.
 	 *
 	 * @var boolean
 	 */
-	protected $supportHtml = false;
+	protected bool $supportHtml = false;
 	
 	/**
 	 * @inheritDoc
@@ -44,15 +44,16 @@ class MCTextDisplayFormField extends AbstractFormField {
 	/**
 	 * @inheritDoc
 	 */
-	public function supportsHTML() {
+	public function supportsHTML() : bool {
 		return $this->supportHtml;
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
-	public function supportHTML($supportHTML = true) {
+	public function supportHTML(bool $supportHTML = true) : MCTextDisplayFormField {
 		$this->supportHtml = $supportHTML;
+		
 		return $this;
 	}
 	
@@ -66,16 +67,17 @@ class MCTextDisplayFormField extends AbstractFormField {
 	/**
 	 * @inheritDoc
 	 */
-	public function getText() {
+	public function getText() : string {
 		return $this->text;
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
-	public function text($text = '') {
+	public function text(string $text = '') : MCTextDisplayFormField {
 		$this->text = $text;
 		$this->value($text);
+		
 		return $this;
 	}
 	

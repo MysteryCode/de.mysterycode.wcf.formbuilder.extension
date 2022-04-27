@@ -1,17 +1,22 @@
 <?php
 
-namespace wcf\system\form\builder\field;
+namespace wcf\system\form\builder\field\wysiwyg;
 
 use wcf\system\attachment\AttachmentHandler;
 use wcf\system\form\builder\data\processor\CustomFormDataProcessor;
+use wcf\system\form\builder\field\AbstractFormField;
 use wcf\system\form\builder\IFormDocument;
+use wcf\system\form\builder\TWysiwygFormNode;
 use wcf\system\WCF;
 use wcf\util\StringUtil;
 
-class MCAttachmentFormField extends AbstractFormField {
+class MCWysiwygAttachmentFormField extends AbstractFormField {
+	use TWysiwygFormNode;
+	
 	/**
 	 * attachment handler
-	 * @var	null|AttachmentHandler
+	 *
+	 * @var null|AttachmentHandler
 	 */
 	protected ?AttachmentHandler $attachmentHandler;
 	
@@ -23,10 +28,10 @@ class MCAttachmentFormField extends AbstractFormField {
 	/**
 	 * @inheritDoc
 	 */
-	protected $templateName = '__wysiwygAttachmentFormField';
+	protected $templateName = '__mcWysiwygAttachmentFormField';
 	
 	/**
-	 * Creates a new instance of `AttachmentFormField`.
+	 * Creates a new instance of `WysiwygAttachmentFormField`.
 	 */
 	public function __construct() {
 		$this->addClass('wide');
@@ -41,14 +46,15 @@ class MCAttachmentFormField extends AbstractFormField {
 	 * AJAX requests or by creating a new one. If the temporary hashes are read from session,
 	 * the session variable will be unregistered afterwards.
 	 *
-	 * @param	null|AttachmentHandler		$attachmentHandler
-	 * @return	static
+	 * @param null|AttachmentHandler $attachmentHandler
+	 * @return  MCWysiwygAttachmentFormField
 	 */
-	public function attachmentHandler(?AttachmentHandler $attachmentHandler = null) {
+	public function attachmentHandler(?AttachmentHandler $attachmentHandler = null) : MCWysiwygAttachmentFormField {
 		if ($attachmentHandler !== null) {
 			if (empty($this->attachmentHandler)) {
 				$tmpHash = StringUtil::getRandomID();
 				if ($this->getDocument()->isAjax()) {
+					/** @deprecated 5.5 see QuickReplyManager::setTmpHash() */
 					$sessionTmpHash = WCF::getSession()->getVar('__wcfAttachmentTmpHash');
 					if ($sessionTmpHash !== null) {
 						$tmpHash = $sessionTmpHash;
@@ -68,9 +74,7 @@ class MCAttachmentFormField extends AbstractFormField {
 		$this->attachmentHandler = $attachmentHandler;
 		
 		if ($this->attachmentHandler !== null) {
-			$this->description('wcf.attachment.upload.limits', [
-				'attachmentHandler' => $this->attachmentHandler
-			]);
+			$this->description('wcf.attachment.upload.limits', ['attachmentHandler' => $this->attachmentHandler,]);
 		}
 		else {
 			$this->description();
@@ -83,7 +87,7 @@ class MCAttachmentFormField extends AbstractFormField {
 	 * Returns the attachment handler object for the uploaded attachments or `null` if no attachment
 	 * upload is supported.
 	 *
-	 * @return	null|AttachmentHandler
+	 * @return  null|AttachmentHandler
 	 */
 	public function getAttachmentHandler() : ?AttachmentHandler {
 		return $this->attachmentHandler ?? null;
@@ -100,7 +104,7 @@ class MCAttachmentFormField extends AbstractFormField {
 	 * @inheritDoc
 	 */
 	public function isAvailable() {
-		return parent::isAvailable() && $this->getAttachmentHandler() !== null;
+		return parent::isAvailable() && $this->getAttachmentHandler() !== null && $this->getAttachmentHandler()->canUpload();
 	}
 	
 	/**
@@ -109,9 +113,9 @@ class MCAttachmentFormField extends AbstractFormField {
 	public function populate() {
 		parent::populate();
 		
-		$this->getDocument()->getDataHandler()->addProcessor(new CustomFormDataProcessor($this->getId(), function(IFormDocument $document, array $parameters) {
+		$this->getDocument()->getDataHandler()->addProcessor(new CustomFormDataProcessor($this->getId(), function (IFormDocument $document, array $parameters) {
 			if ($this->getAttachmentHandler() !== null) {
-				$parameters[$this->getId() . '_attachmentHandler'] = $this->getAttachmentHandler();
+				$parameters[$this->getWysiwygId() . '_attachmentHandler'] = $this->getAttachmentHandler();
 			}
 			
 			return $parameters;
@@ -126,20 +130,12 @@ class MCAttachmentFormField extends AbstractFormField {
 	public function readValue() {
 		if ($this->getDocument()->hasRequestData($this->getPrefixedId() . '_tmpHash')) {
 			$tmpHash = $this->getDocument()->getRequestData($this->getPrefixedId() . '_tmpHash');
-			if (is_string($tmpHash)) {
+			if (\is_string($tmpHash)) {
 				$this->getAttachmentHandler()->setTmpHashes([$tmpHash]);
 			}
-			else if (is_array($tmpHash)) {
+			else if (\is_array($tmpHash)) {
 				$this->getAttachmentHandler()->setTmpHashes($tmpHash);
 			}
 		}
-	}
-	
-	/**
-	 * Dummy method in order to be able to use the wysiwyg attachment template
-	 * @return string
-	 */
-	public function getPrefixedWysiwygId() : string {
-		return '';
 	}
 }

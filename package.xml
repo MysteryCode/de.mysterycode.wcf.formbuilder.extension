@@ -2,18 +2,20 @@
 <package name="de.mysterycode.wcf.formbuilder.extension" xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/hurricane/package.xsd">
 	<packageinformation>
 		<packagename><![CDATA[Form Builder: Extension]]></packagename>
-		<packagedescription><![CDATA[Extension for the form builder API provided by WoltLab Suite Core 5.2+]]></packagedescription>
+		<packagename language="de"><![CDATA[Form Builder: Erweiterung]]></packagename>
+		<packagedescription><![CDATA[Extension for the form builder API.]]></packagedescription>
+		<packagedescription language="de"><![CDATA[Erweiterung für die Form Builder-API.]]></packagedescription>
 		
-		<version><![CDATA[1.0.0]]></version>
-		<date><![CDATA[2021-07-16]]></date>
+		<version><![CDATA[1.2.0]]></version>
+		<date><![CDATA[2022-04-27]]></date>
 	</packageinformation>
 	
 	<requiredpackages>
-		<requiredpackage minversion="5.2.9"><![CDATA[com.woltlab.wcf]]></requiredpackage>
+		<requiredpackage minversion="5.5.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></requiredpackage>
 	</requiredpackages>
 	
 	<excludedpackages>
-		<excludedpackage version="5.5.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></excludedpackage>
+		<excludedpackage version="5.6.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></excludedpackage>
 	</excludedpackages>
 	
 	<authorinformation>
@@ -22,22 +24,6 @@
 	</authorinformation>
 	
 	<instructions type="install">
-		<instruction type="file" />
-		<instruction type="acpTemplate" />
-		<instruction type="template" />
-	</instructions>
-	
-	<instructions type="update" fromversion="1.0.0 Alpha *">
-		<instruction type="file">files_update.tar</instruction>
-		<instruction type="script" run="standalone">acp/update_de.mysterycode.wcf.formBuilder.extension.php</instruction>
-		
-		<instruction type="file" />
-		<instruction type="acpTemplate" />
-		<instruction type="template" />
-	</instructions>
-	<instructions type="update" fromversion="1.0.0 Beta *">
-		<instruction type="script" run="standalone">acp/update_de.mysterycode.wcf.formBuilder.extension.php</instruction>
-		
 		<instruction type="file" />
 		<instruction type="acpTemplate" />
 		<instruction type="template" />

@@ -36,12 +36,12 @@ class MCPasswordFormField extends AbstractFormField implements IAutoFocusFormFie
 	/**
 	 * @var integer
 	 */
-	protected $minimumPasswordStrength;
+	protected int $minimumPasswordStrength;
 	
 	/**
 	 * @var mixed[]
 	 */
-	protected $passwordStrength;
+	protected array $passwordStrength;
 	
 	/**
 	 * @inheritDoc
@@ -62,7 +62,7 @@ class MCPasswordFormField extends AbstractFormField implements IAutoFocusFormFie
 	 * 
 	 * @param	string		$text		validated password
 	 */
-	protected function validateText($text) {
+	protected function validateText(string $text) : void {
 		$this->validateMinimumLength($text);
 		$this->validateMaximumLength($text);
 		$this->validateMinimumStrength($text);
@@ -75,17 +75,17 @@ class MCPasswordFormField extends AbstractFormField implements IAutoFocusFormFie
 		if ($this->getDocument()->hasRequestData($this->getPrefixedId())) {
 			$value = $this->getDocument()->getRequestData($this->getPrefixedId());
 			
-			if (is_string($value)) {
+			if (\is_string($value)) {
 				$this->value = StringUtil::trim($value);
 			}
 		}
 		if ($this->getDocument()->hasRequestData($this->getPrefixedId() . '_passwordStrengthVerdict')) {
 			$strength = $this->getDocument()->getRequestData($this->getPrefixedId() . '_passwordStrengthVerdict');
 			
-			if (is_string($strength)) {
+			if (\is_string($strength)) {
 				$this->passwordStrength = ArrayUtil::trim(JSON::decode($strength));
 			}
-			else if (is_array($strength)) {
+			else if (\is_array($strength)) {
 				$this->passwordStrength = ArrayUtil::trim($strength);
 			}
 		}
@@ -99,7 +99,7 @@ class MCPasswordFormField extends AbstractFormField implements IAutoFocusFormFie
 	 * @param	string		$text			validated password
 	 * @param	string		$errorLanguageItem
 	 */
-	public function validateMinimumStrength($text, $errorLanguageItem = 'wcf.user.password.error.notSecure') {
+	public function validateMinimumStrength(string $text, string $errorLanguageItem = 'wcf.user.password.error.notSecure') : void {
 		if ($this->getMinimumPasswordStrength() !== null && (empty($this->passwordStrength['score']) || $this->passwordStrength['score'] < $this->getMinimumPasswordStrength())) {
 			$this->addValidationError(new FormFieldValidationError('notSecure', $errorLanguageItem));
 		}
@@ -107,16 +107,19 @@ class MCPasswordFormField extends AbstractFormField implements IAutoFocusFormFie
 	
 	/**
 	 * @param integer $minValue
+	 * @return static
 	 */
-	public function minimumPasswordStrength($minValue = PASSWORD_MIN_SCORE) {
+	public function minimumPasswordStrength(int $minValue = PASSWORD_MIN_SCORE) : MCPasswordFormField {
 		$this->minimumPasswordStrength = $minValue;
+		
+		return $this;
 	}
 	
 	/**
 	 * @return integer
 	 */
 	public function getMinimumPasswordStrength() : int {
-		return $this->minimumPasswordStrength;
+		return $this->minimumPasswordStrength ?? PASSWORD_MIN_SCORE;
 	}
 	
 	/**

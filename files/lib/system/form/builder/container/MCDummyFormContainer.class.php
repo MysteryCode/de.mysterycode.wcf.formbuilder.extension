@@ -14,7 +14,7 @@ class MCDummyFormContainer extends FormContainer {
 	 * @inheritDoc
 	 */
 	public function getHtml() {
-		return WCF::getTPL()->fetch('__formContainerChildren', 'wcf', array_merge($this->getHtmlVariables(), [
+		return WCF::getTPL()->fetch('__formContainerChildren', 'wcf', \array_merge($this->getHtmlVariables(), [
 			'container' => $this
 		]), true);
 	}

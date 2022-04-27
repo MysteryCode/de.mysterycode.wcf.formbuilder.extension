@@ -14,26 +14,26 @@ class MCAttachmentFormContainer extends FormContainer {
 	 *
 	 * @var        MCAttachmentFormField
 	 */
-	protected $attachmentField;
+	protected MCAttachmentFormField $attachmentField;
 	
 	/**
 	 * attachment-related data used to create an `AttachmentHandler` object for the attachment
 	 * form field
 	 * @var	null|array
 	 */
-	protected $attachmentData;
+	protected ?array $attachmentData;
 	
 	/**
 	 * id of the edited object
 	 * @var	integer
 	 */
-	protected $objectId;
+	protected int $objectId;
 	
 	/**
 	 * id of the field itself
 	 * @var	integer
 	 */
-	protected $fieldId;
+	protected int $fieldId;
 	
 	/**
 	 * @inheritDoc
@@ -55,7 +55,7 @@ class MCAttachmentFormContainer extends FormContainer {
 	 * @return	static					this form container
 	 * @throws	\BadMethodCallException			if the attachment form field has already been initialized
 	 */
-	public function attachmentData($objectType = null, $parentObjectID = 0) {
+	public function attachmentData(string $objectType = null, int $parentObjectID = 0) : MCAttachmentFormContainer {
 		if ($this->attachmentField !== null) {
 			throw new \BadMethodCallException("The attachment form field has already been initialized. Use the atatchment form field directly to manipulate attachment data.");
 		}
@@ -83,8 +83,8 @@ class MCAttachmentFormContainer extends FormContainer {
 	 * @return        MCAttachmentFormField
 	 * @throws	\BadMethodCallException		if the form field container has not been populated yet/form has not been built yet
 	 */
-	public function getAttachmentField() {
-		if ($this->attachmentField === null) {
+	public function getAttachmentField() : ?MCAttachmentFormField {
+		if (empty($this->attachmentField)) {
 			throw new \BadMethodCallException("attachment form field can only be requested after the form has been built.");
 		}
 		
@@ -96,8 +96,8 @@ class MCAttachmentFormContainer extends FormContainer {
 	 *
 	 * @return	integer
 	 */
-	public function getObjectId() {
-		return $this->objectId;
+	public function getObjectId() : int {
+		return $this->objectId ?? 0;
 	}
 	
 	/**
