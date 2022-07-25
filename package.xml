@@ -6,12 +6,12 @@
 		<packagedescription><![CDATA[Extension for the form builder API.]]></packagedescription>
 		<packagedescription language="de"><![CDATA[Erweiterung für die Form Builder-API.]]></packagedescription>
 		
-		<version><![CDATA[1.2.0]]></version>
-		<date><![CDATA[2022-04-27]]></date>
+		<version><![CDATA[1.2.1]]></version>
+		<date><![CDATA[2022-07-25]]></date>
 	</packageinformation>
 	
 	<requiredpackages>
-		<requiredpackage minversion="5.5.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></requiredpackage>
+		<requiredpackage minversion="5.5.0"><![CDATA[com.woltlab.wcf]]></requiredpackage>
 	</requiredpackages>
 	
 	<excludedpackages>
@@ -24,6 +24,15 @@
 	</authorinformation>
 	
 	<instructions type="install">
+		<instruction type="file" />
+		<instruction type="acpTemplate" />
+		<instruction type="template" />
+	</instructions>
+	
+	<instructions type="update" fromversion="1.2.0">
+		<void/>
+	</instructions>
+	<instructions type="update" fromversion="1.0.0">
 		<instruction type="file" />
 		<instruction type="acpTemplate" />
 		<instruction type="template" />
