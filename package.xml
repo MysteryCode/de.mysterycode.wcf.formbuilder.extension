@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package name="de.mysterycode.wcf.formbuilder.extension" xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/hurricane/package.xsd">
+<package name="de.mysterycode.wcf.formbuilder.extension" xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com https://www.woltlab.com/XSD/5.4/package.xsd">
 	<packageinformation>
 		<packagename><![CDATA[Form Builder: Extension]]></packagename>
 		<packagename language="de"><![CDATA[Form Builder: Erweiterung]]></packagename>
 		<packagedescription><![CDATA[Extension for the form builder API.]]></packagedescription>
 		<packagedescription language="de"><![CDATA[Erweiterung für die Form Builder-API.]]></packagedescription>
-		<version><![CDATA[1.2.1]]></version>
+		<version>1.2.2</version>
 		<date><![CDATA[2022-07-26]]></date>
         <license><![CDATA[Lesser General Public License (LGPL)]]></license>
 	</packageinformation>
@@ -31,15 +31,5 @@
 
 	<instructions type="update" fromversion="1.2.1">
 		<instruction type="file" />
-	</instructions>
-
-	<instructions type="update" fromversion="1.2.0">
-		<void/>
-	</instructions>
-
-	<instructions type="update" fromversion="1.0.0">
-		<instruction type="file" />
-		<instruction type="acpTemplate" />
-		<instruction type="template" />
 	</instructions>
 </package>
