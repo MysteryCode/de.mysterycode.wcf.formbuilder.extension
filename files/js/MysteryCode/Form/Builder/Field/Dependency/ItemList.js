@@ -1,8 +1,8 @@
 /**
  * Data handler for a ItemList-bases form builder field in an Ajax form.
  *
- * @author      Florian Gail
- * @module      MysteryCode/Form/Builder/Field/Dependency/ItemList
+ * @author Florian Gail
+ * @module MysteryCode/Form/Builder/Field/Dependency/ItemList
  */
 define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Dependency/Abstract", "WoltLabSuite/Core/Ui/ItemList", "WoltLabSuite/Core/Form/Builder/Field/Dependency/Manager"], function (require, exports, tslib_1, Abstract_1, UiItemList, DependencyManager) {
     "use strict";

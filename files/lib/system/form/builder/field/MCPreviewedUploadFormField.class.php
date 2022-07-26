@@ -13,6 +13,7 @@ namespace wcf\system\form\builder\field;
  * @since   5.2
  * @deprecated use \wcf\system\form\builder\field\UploadFormField instead
  */
-class MCPreviewedUploadFormField extends UploadFormField {
-	// dummy wrapper
+class MCPreviewedUploadFormField extends UploadFormField
+{
+    // dummy wrapper
 }

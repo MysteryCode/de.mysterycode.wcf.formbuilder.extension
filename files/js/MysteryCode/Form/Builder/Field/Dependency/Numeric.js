@@ -1,8 +1,8 @@
 /**
  * Data handler for a user form builder field in an Ajax form.
  *
- * @author      Florian Gail
- * @module      MysteryCode/Form/Builder/Field/Dependency/Numeric
+ * @author Florian Gail
+ * @module MysteryCode/Form/Builder/Field/Dependency/Numeric
  */
 define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Dependency/Abstract"], function (require, exports, tslib_1, Abstract_1) {
     "use strict";
@@ -31,28 +31,28 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Dep
                 throw new Error("Operator has not been set.");
             }
             const comparison = {
-                '>': (a, b) => {
+                ">": (a, b) => {
                     return a > b;
                 },
-                '>=': (a, b) => {
+                ">=": (a, b) => {
                     return a >= b;
                 },
-                '<': (a, b) => {
+                "<": (a, b) => {
                     return a < b;
                 },
-                '<=': (a, b) => {
+                "<=": (a, b) => {
                     return a <= b;
                 },
-                '==': (a, b) => {
+                "==": (a, b) => {
                     return a == b;
                 },
-                '===': (a, b) => {
+                "===": (a, b) => {
                     return a === b;
                 },
             };
             if (this._field) {
                 const field = this._field;
-                if (field.value === '') {
+                if (field.value === "") {
                     return false;
                 }
                 return comparison[this._operator](field.value, this._referenceValue);

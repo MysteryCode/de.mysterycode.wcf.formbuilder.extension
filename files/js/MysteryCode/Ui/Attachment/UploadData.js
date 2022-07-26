@@ -1,6 +1,6 @@
 /**
- * @author      Florian Gail
- * @module      MysteryCode/Ui/Attachment/Upload/Data
+ * @author Florian Gail
+ * @module MysteryCode/Ui/Attachment/Upload/Data
  */
 define(["require", "exports"], function (require, exports) {
     "use strict";
