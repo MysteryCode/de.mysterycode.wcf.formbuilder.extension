@@ -1,6 +1,0 @@
-WSC:
-  script:
-    - git ls-files | xargs wc -l
-    - find . -type f -name '*.php' -not -path "./WCF/*" |xargs -I file php -l file
-    - git clone --branch=5.3 --depth=1 --quiet git://github.com/WoltLab/WCF.git WCF
-    - phpcs -p --extensions=php --standard="`pwd`/WCF/CodeSniff/WCF" . --ignore="/WCF/*"

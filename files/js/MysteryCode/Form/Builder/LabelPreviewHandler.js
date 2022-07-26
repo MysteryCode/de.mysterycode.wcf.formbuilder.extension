@@ -1,8 +1,8 @@
 /**
  * Data handler for a user form builder field in an Ajax form.
  *
- * @author      Florian Gail
- * @module      MysteryCode/Form/Builder/LabelPreviewHandler
+ * @author Florian Gail
+ * @module MysteryCode/Form/Builder/LabelPreviewHandler
  */
 define(["require", "exports"], function (require, exports) {
     "use strict";
@@ -54,11 +54,11 @@ define(["require", "exports"], function (require, exports) {
                     }
                 }
             }
-            if (value === '') {
+            if (value === "") {
                 value = this._defaultText;
             }
             if (value !== null) {
-                this._dependentElement.querySelectorAll('.jsLabelPreview').forEach((element) => {
+                this._dependentElement.querySelectorAll(".jsLabelPreview").forEach((element) => {
                     element.innerText = value;
                 });
             }

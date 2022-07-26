@@ -1,6 +1,6 @@
 /**
- * @author      Florian Gail
- * @module      MysteryCode/Ui/Attachment/Upload
+ * @author Florian Gail
+ * @module MysteryCode/Ui/Attachment/Upload
  */
 define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/Core/Dom/Util", "WoltLabSuite/Core/Core", "WoltLabSuite/Core/Language", "WoltLabSuite/Core/Event/Handler", "WoltLabSuite/Core/Image/ImageUtil", "WoltLabSuite/Core/Image/Resizer", "WoltLabSuite/Core/Dom/Change/Listener", "WoltLabSuite/Core/Dom/Change/Listener", "WoltLabSuite/Core/Upload", "WoltLabSuite/Core/Environment", "WoltLabSuite/Core/FileUtil"], function (require, exports, tslib_1, Ajax, DomUtil, Core, Language, EventHandler, ImageUtil, Resizer_1, ChangeListener, Listener_1, Upload_1, Environment, FileUtil) {
     "use strict";
@@ -22,10 +22,10 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         constructor(buttonContainerId, targetId, objectType, objectID, tmpHash, parentObjectID, maxUploads, editorId, options) {
             super(buttonContainerId, targetId, Core.extend({
                 multiple: true,
-                className: 'wcf\\data\\attachment\\VieCodeShopAttachmentAction',
+                className: "wcf\\data\\attachment\\VieCodeShopAttachmentAction",
                 maxUploads: maxUploads,
                 singleFileRequests: true,
-                objectType: objectType
+                objectType: objectType,
             }, options));
             this._autoInsert = [];
             this._replaceOnLoad = {};
@@ -35,52 +35,52 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             this._parentObjectID = parentObjectID;
             this._editorId = editorId;
             this.checkMaxFiles();
-            this._target.querySelectorAll(':scope > li:not(.uploadFailed)').forEach((attachment) => {
+            this._target.querySelectorAll(":scope > li:not(.uploadFailed)").forEach((attachment) => {
                 this.registerEditorButtons(attachment);
             });
-            EventHandler.add('com.woltlab.wcf.action.delete', 'attachment', (data) => this.onDelete(data));
+            EventHandler.add("com.woltlab.wcf.action.delete", "attachment", (data) => this.onDelete(data));
             this.makeSortable();
             // for backwards compatibility, the object is still created but only inserted
             // if an editor is used
-            this._insertAllButton = document.createElement('p');
-            this._insertAllButton.classList.add('button', 'jsButtonAttachmentInsertAll');
-            this._insertAllButton.textContent = Language.get('wcf.attachment.insertAll');
+            this._insertAllButton = document.createElement("p");
+            this._insertAllButton.classList.add("button", "jsButtonAttachmentInsertAll");
+            this._insertAllButton.textContent = Language.get("wcf.attachment.insertAll");
             DomUtil.hide(this._insertAllButton);
             if (this._editorId) {
                 this._buttonContainer.appendChild(this._insertAllButton);
-                this._insertAllButton.addEventListener('click', () => this.insertAll());
-                if (this._target.querySelectorAll(':scope > li:not(.uploadFailed)').length) {
+                this._insertAllButton.addEventListener("click", () => this.insertAll());
+                if (this._target.querySelectorAll(":scope > li:not(.uploadFailed)").length) {
                     DomUtil.show(this._insertAllButton);
                 }
-                EventHandler.add('com.woltlab.wcf.redactor2', 'submit_' + this._editorId, (data) => this.submitInline(data));
-                EventHandler.add('com.woltlab.wcf.redactor2', 'reset_' + this._editorId, () => this.reset());
-                EventHandler.add('com.woltlab.wcf.redactor2', 'dragAndDrop_' + this._editorId, (data) => this.editorUpload(data));
-                EventHandler.add('com.woltlab.wcf.redactor2', 'pasteFromClipboard_' + this._editorId, (data) => this.editorUpload(data));
-                EventHandler.add('com.woltlab.wcf.redactor2', 'autosaveMetaData_' + this._editorId, (data) => {
+                EventHandler.add("com.woltlab.wcf.redactor2", "submit_" + this._editorId, (data) => this.submitInline(data));
+                EventHandler.add("com.woltlab.wcf.redactor2", "reset_" + this._editorId, () => this.reset());
+                EventHandler.add("com.woltlab.wcf.redactor2", "dragAndDrop_" + this._editorId, (data) => this.editorUpload(data));
+                EventHandler.add("com.woltlab.wcf.redactor2", "pasteFromClipboard_" + this._editorId, (data) => this.editorUpload(data));
+                EventHandler.add("com.woltlab.wcf.redactor2", "autosaveMetaData_" + this._editorId, (data) => {
                     if (!data.tmpHashes || !Array.isArray(data.tmpHashes)) {
                         data.tmpHashes = [];
                     }
                     // Remove any existing entries for this tmpHash.
                     data.tmpHashes = data.tmpHashes.filter((item) => item !== tmpHash);
-                    const count = this._target.querySelectorAll(':scope > li:not(.uploadFailed)').length;
+                    const count = this._target.querySelectorAll(":scope > li:not(.uploadFailed)").length;
                     if (count > 0) {
                         // Add a new entry for this tmpHash if files have been uploaded.
                         data.tmpHashes.push(tmpHash);
                     }
                 });
-                const form = this._target.closest('form');
+                const form = this._target.closest("form");
                 if (form !== null) {
                     // Read any cached `tmpHash` values from the autosave feature.
                     const metaData = {};
-                    form.dataset.attachmentTmpHashes = '';
-                    EventHandler.fire('com.woltlab.wcf.redactor2', 'getMetaData_' + this._editorId, metaData);
+                    form.dataset.attachmentTmpHashes = "";
+                    EventHandler.fire("com.woltlab.wcf.redactor2", "getMetaData_" + this._editorId, metaData);
                     if (metaData.tmpHashes && Array.isArray(metaData.tmpHashes) && metaData.tmpHashes.length > 0) {
                         // Caching the values here preserves them from the removal
                         // caused by the automated cleanup that runs on form submit
                         // and is bound before our event listener.
-                        form.dataset.attachmentTmpHashes = metaData.tmpHashes.join(',');
+                        form.dataset.attachmentTmpHashes = metaData.tmpHashes.join(",");
                     }
-                    form.addEventListener('submit', () => {
+                    form.addEventListener("submit", () => {
                         let tmpHash = this._tmpHash;
                         if (form.dataset.attachmentTmpHashes) {
                             tmpHash += `,${form.dataset.attachmentTmpHashes}`;
@@ -91,23 +91,23 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                         }
                     });
                 }
-                const metacodeAttachUuid = EventHandler.add('com.woltlab.wcf.redactor2', 'metacode_attach_' + this._editorId, (data) => {
+                const metacodeAttachUuid = EventHandler.add("com.woltlab.wcf.redactor2", "metacode_attach_" + this._editorId, (data) => {
                     const images = this.getImageAttachments();
                     const attachmentId = data.attributes[0] || 0;
                     if (Object.hasOwnProperty.call(images, attachmentId)) {
-                        const thumbnailWidth = ~~$('#' + this._editorId).data('redactor').opts.woltlab.attachmentThumbnailWidth;
+                        const thumbnailWidth = ~~$("#" + this._editorId).data("redactor").opts.woltlab.attachmentThumbnailWidth;
                         let thumbnail = data.attributes[2];
-                        thumbnail = (thumbnail === true || thumbnail === 'true' || (~~thumbnail && ~~thumbnail <= thumbnailWidth));
-                        const image = document.createElement('img');
-                        image.className = 'woltlabAttachment';
-                        image.src = images[attachmentId][(thumbnail ? 'thumbnailUrl' : 'url')];
+                        thumbnail = thumbnail === true || thumbnail === "true" || (~~thumbnail && ~~thumbnail <= thumbnailWidth);
+                        const image = document.createElement("img");
+                        image.className = "woltlabAttachment";
+                        image.src = images[attachmentId][thumbnail ? "thumbnailUrl" : "url"];
                         image.dataset.attachmentId = attachmentId;
-                        const float = data.attributes[1] || 'none';
-                        if (float === 'left') {
-                            image.classList.add('messageFloatObjectLeft');
+                        const float = data.attributes[1] || "none";
+                        if (float === "left") {
+                            image.classList.add("messageFloatObjectLeft");
                         }
-                        else if (float === 'right') {
-                            image.classList.add('messageFloatObjectRight');
+                        else if (float === "right") {
+                            image.classList.add("messageFloatObjectRight");
                         }
                         const metacode = data.metacode;
                         metacode.parentNode.insertBefore(image, metacode);
@@ -115,16 +115,16 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                         data.cancel = true;
                     }
                 });
-                const syncUuid = EventHandler.add('com.woltlab.wcf.redactor2', 'sync_' + this._tmpHash, (data) => this.sync(data));
-                EventHandler.add('com.woltlab.wcf.redactor2', 'destroy_' + this._editorId, () => {
-                    EventHandler.removeAll('com.woltlab.wcf.redactor2', 'submit_' + this._editorId);
-                    EventHandler.removeAll('com.woltlab.wcf.redactor2', 'reset_' + this._editorId);
-                    EventHandler.removeAll('com.woltlab.wcf.redactor2', 'insertAttachment_' + this._editorId);
-                    EventHandler.removeAll('com.woltlab.wcf.redactor2', 'dragAndDrop_' + this._editorId);
-                    EventHandler.removeAll('com.woltlab.wcf.redactor2', 'pasteFromClipboard_' + this._editorId);
-                    EventHandler.removeAll('com.woltlab.wcf.redactor2', 'autosaveMetaData_' + this._editorId);
-                    EventHandler.remove('com.woltlab.wcf.redactor2', 'metacode_attach_' + this._editorId, metacodeAttachUuid);
-                    EventHandler.remove('com.woltlab.wcf.redactor2', 'sync_' + this._tmpHash, syncUuid);
+                const syncUuid = EventHandler.add("com.woltlab.wcf.redactor2", "sync_" + this._tmpHash, (data) => this.sync(data));
+                EventHandler.add("com.woltlab.wcf.redactor2", "destroy_" + this._editorId, () => {
+                    EventHandler.removeAll("com.woltlab.wcf.redactor2", "submit_" + this._editorId);
+                    EventHandler.removeAll("com.woltlab.wcf.redactor2", "reset_" + this._editorId);
+                    EventHandler.removeAll("com.woltlab.wcf.redactor2", "insertAttachment_" + this._editorId);
+                    EventHandler.removeAll("com.woltlab.wcf.redactor2", "dragAndDrop_" + this._editorId);
+                    EventHandler.removeAll("com.woltlab.wcf.redactor2", "pasteFromClipboard_" + this._editorId);
+                    EventHandler.removeAll("com.woltlab.wcf.redactor2", "autosaveMetaData_" + this._editorId);
+                    EventHandler.remove("com.woltlab.wcf.redactor2", "metacode_attach_" + this._editorId, metacodeAttachUuid);
+                    EventHandler.remove("com.woltlab.wcf.redactor2", "sync_" + this._tmpHash, syncUuid);
                 });
             }
         }
@@ -161,16 +161,16 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             const item = blob ? blob : file;
             // Ignore anything that is not a widely used mimetype for static images.
             // GIFs are not supported due to the support for animations.
-            if (['image/png', 'image/jpeg', 'image/webp'].indexOf(item.type) === -1) {
+            if (["image/png", "image/jpeg", "image/webp"].indexOf(item.type) === -1) {
                 if (blob) {
                     return Promise.resolve(this._upload(null, null, blob));
                 }
                 return Promise.resolve(this._upload(null, file));
             }
             if (blob) {
-                file = FileUtil.blobToFile(blob, 'pasted-from-clipboard');
+                file = FileUtil.blobToFile(blob, "pasted-from-clipboard");
             }
-            const maxSize = parseInt(this._buttonContainer.dataset.maxSize || '');
+            const maxSize = parseInt(this._buttonContainer.dataset.maxSize || "");
             const resizer = new Resizer_1.default();
             const timeout = new Promise((resolve) => {
                 // We issue one timeout per image, thus multiple timeout
@@ -179,7 +179,8 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                     resolve(file);
                 }, 10000);
             });
-            return resizer.loadFile(file)
+            return resizer
+                .loadFile(file)
                 .then((result) => {
                 const exif = result.exif;
                 let maxWidth = this._options.autoScale.maxWidth;
@@ -190,24 +191,27 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                     const realHeight = window.screen.height * window.devicePixelRatio;
                     // Check whether the width of the image is roughly the width of the physical screen, and
                     // the height of the image is at least the height of the physical screen.
-                    if (realWidth - 10 < result.image.width && result.image.width < realWidth + 10 && realHeight - 10 < result.image.height) {
+                    if (realWidth - 10 < result.image.width &&
+                        result.image.width < realWidth + 10 &&
+                        realHeight - 10 < result.image.height) {
                         // This appears to be a screenshot from a HiDPI device in portrait mode: Scale to logical size
                         maxWidth = Math.min(maxWidth, window.screen.width);
                     }
                 }
-                return resizer.resize(result.image, maxWidth, maxHeight, quality, file.size > maxSize, timeout)
+                return resizer
+                    .resize(result.image, maxWidth, maxHeight, quality, file.size > maxSize, timeout)
                     .then((resizedImage) => {
                     // Check whether the image actually was resized
                     if (resizedImage === undefined) {
                         return file;
                     }
                     let fileType = this._options.autoScale.fileType;
-                    if (this._options.autoScale.fileType === 'keep' || ImageUtil.containsTransparentPixels(resizedImage)) {
+                    if (this._options.autoScale.fileType === "keep" || ImageUtil.containsTransparentPixels(resizedImage)) {
                         fileType = file.type;
                     }
                     return resizer.saveFile({
                         exif: exif,
-                        image: resizedImage
+                        image: resizedImage,
                     }, file.name, fileType, quality);
                 })
                     .then((resizedFile) => {
@@ -254,9 +258,9 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             }
         }
         insert(event) {
-            EventHandler.fire('com.woltlab.wcf.redactor2', 'insertAttachment_' + this._editorId, {
+            EventHandler.fire("com.woltlab.wcf.redactor2", "insertAttachment_" + this._editorId, {
                 attachmentId: event.currentTarget.dataset.objectId || 0,
-                url: event.currentTarget.dataset.url || '',
+                url: event.currentTarget.dataset.url || "",
             });
         }
         insertAll() {
@@ -264,17 +268,17 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             let button;
             for (let i = 0, length = this._target.childNodes.length; i < length; i++) {
                 attachment = this._target.childNodes[i];
-                if (attachment.nodeName === 'LI' && !attachment.classList.contains('uploadFailed')) {
-                    button = attachment.querySelector('.jsButtonAttachmentInsertThumbnail, .jsButtonAttachmentInsertPlain');
+                if (attachment.nodeName === "LI" && !attachment.classList.contains("uploadFailed")) {
+                    button = attachment.querySelector(".jsButtonAttachmentInsertThumbnail, .jsButtonAttachmentInsertPlain");
                     if (button === null) {
-                        button = attachment.querySelector('.jsButtonAttachmentInsertFull, .jsButtonAttachmentInsertPlain');
+                        button = attachment.querySelector(".jsButtonAttachmentInsertFull, .jsButtonAttachmentInsertPlain");
                     }
-                    button === null || button === void 0 ? void 0 : button.dispatchEvent(new MouseEvent('click'));
+                    button === null || button === void 0 ? void 0 : button.dispatchEvent(new MouseEvent("click"));
                 }
             }
         }
         onDelete(data) {
-            const objectId = parseInt(data.button.dataset.objectId || '', 10);
+            const objectId = parseInt(data.button.dataset.objectId || "", 10);
             const attachment = this._target.querySelector(`.formAttachmentListItem[data-object-id="${objectId}"]`);
             if (attachment !== null) {
                 attachment.remove();
@@ -282,30 +286,30 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         }
         makeSortable() {
             let attachmentsFound = false;
-            this._target.querySelectorAll(':scope > li:not(.uploadFailed)').forEach((attachment) => {
+            this._target.querySelectorAll(":scope > li:not(.uploadFailed)").forEach((attachment) => {
                 attachmentsFound = true;
-                if (!attachment.classList.contains('sortableAttachment')) {
-                    attachment.classList.add('sortableAttachment');
+                if (!attachment.classList.contains("sortableAttachment")) {
+                    attachment.classList.add("sortableAttachment");
                 }
-                const img = attachment.querySelector('img');
-                if (img !== null && !img.classList.contains('sortableNode')) {
-                    img.classList.add('sortableNode');
+                const img = attachment.querySelector("img");
+                if (img !== null && !img.classList.contains("sortableNode")) {
+                    img.classList.add("sortableNode");
                 }
             });
-            if (attachmentsFound && !this._target.classList.contains('sortableList')) {
-                this._target.classList.add('sortableList');
-                if (Environment.platform() === 'desktop') {
-                    new window.WCF.Sortable.List(DomUtil.identify(this._target.parentNode), '', 0, {
+            if (attachmentsFound && !this._target.classList.contains("sortableList")) {
+                this._target.classList.add("sortableList");
+                if (Environment.platform() === "desktop") {
+                    new window.WCF.Sortable.List(DomUtil.identify(this._target.parentNode), "", 0, {
                         axis: false,
-                        items: 'li.sortableAttachment',
+                        items: "li.sortableAttachment",
                         toleranceElement: null,
                         start: (event, ui) => {
                             const offsetHeight = ui.helper[0].offsetHeight;
-                            ui.placeholder[0].style.setProperty('height', `${offsetHeight}px`, '');
+                            ui.placeholder[0].style.setProperty("height", `${offsetHeight}px`, "");
                         },
                         update: () => {
                             const attachmentIDs = [];
-                            this._target.querySelectorAll(':scope > li:not(.uploadFailed)').forEach((listItem) => {
+                            this._target.querySelectorAll(":scope > li:not(.uploadFailed)").forEach((listItem) => {
                                 if (listItem.dataset.objectId) {
                                     attachmentIDs.push(parseInt(listItem.dataset.objectId, 10));
                                 }
@@ -313,29 +317,29 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                             if (attachmentIDs.length) {
                                 Ajax.apiOnce({
                                     data: {
-                                        actionName: 'updatePosition',
-                                        className: 'wcf\\data\\attachment\\VieCodeShopAttachmentAction',
+                                        actionName: "updatePosition",
+                                        className: "wcf\\data\\attachment\\VieCodeShopAttachmentAction",
                                         parameters: {
                                             attachmentIDs: attachmentIDs,
                                             objectID: this._objectID,
                                             objectType: this._options.objectType,
-                                            tmpHash: this._tmpHash
-                                        }
+                                            tmpHash: this._tmpHash,
+                                        },
                                     },
                                 });
                             }
-                        }
+                        },
                     }, true);
                 }
             }
         }
         getImageAttachments() {
             const images = {};
-            this._target.querySelectorAll(':scope > li').forEach((element) => {
+            this._target.querySelectorAll(":scope > li").forEach((element) => {
                 if (element.dataset.isImage) {
                     images[~~(element.dataset.objectId || 0)] = {
-                        thumbnailUrl: element.querySelector('.jsButtonAttachmentInsertThumbnail').dataset.url || null,
-                        url: element.querySelector('.jsButtonAttachmentInsertFull').dataset.url
+                        thumbnailUrl: element.querySelector(".jsButtonAttachmentInsertThumbnail").dataset.url || null,
+                        url: element.querySelector(".jsButtonAttachmentInsertFull").dataset.url,
                     };
                 }
             });
@@ -345,9 +349,9 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             if (this._tmpHash) {
                 data.tmpHash = this._tmpHash;
                 const metaData = {};
-                EventHandler.fire('com.woltlab.wcf.redactor2', 'getMetaData_' + this._editorId, metaData);
+                EventHandler.fire("com.woltlab.wcf.redactor2", "getMetaData_" + this._editorId, metaData);
                 if (metaData.tmpHashes && Array.isArray(metaData.tmpHashes) && metaData.tmpHashes.length > 0) {
-                    data.tmpHash += ',' + metaData.tmpHashes.join(',');
+                    data.tmpHash += "," + metaData.tmpHashes.join(",");
                 }
             }
         }
@@ -364,10 +368,12 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         editorUpload(data) {
             // show tab
             // TODO stupid jQuery
-            $(this._target.closest('.messageTabMenu')).messageTabMenu('showTab', 'attachments', true);
+            $(this._target.closest(".messageTabMenu")).messageTabMenu("showTab", "attachments", true);
             const item = data.file ? data.file : data.blob;
             let promise;
-            if (this._options.autoScale && this._options.autoScale.enable && ['image/png', 'image/jpeg', 'image/webp'].indexOf(item.type) !== -1) {
+            if (this._options.autoScale &&
+                this._options.autoScale.enable &&
+                ["image/png", "image/jpeg", "image/webp"].indexOf(item.type) !== -1) {
                 if (data.blob) {
                     promise = this.resize(null, data.blob);
                 }
@@ -386,7 +392,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                 if (Array.isArray(uploadId) && uploadId.length === 1) {
                     uploadId = uploadId.pop();
                 }
-                if (typeof uploadId === 'number') {
+                if (typeof uploadId === "number") {
                     if (!Array.isArray(uploadId)) {
                         if (!data.file && data.replace) {
                             this._replaceOnLoad[uploadId] = data.replace;
@@ -403,7 +409,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                 return;
             }
             switch (payload.type) {
-                case 'new':
+                case "new":
                     this.syncNew(payload.data);
                     break;
                 default:
@@ -412,15 +418,15 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         }
         syncNew(data) {
             const fragment = DomUtil.createFragmentFromHtml(data.html);
-            const attachment = fragment.querySelector(':scope > li');
-            attachment.id = '';
+            const attachment = fragment.querySelector(":scope > li");
+            attachment.id = "";
             this.registerEditorButtons(attachment);
             this._target.appendChild(attachment);
         }
         rebuildInterface() {
             this.makeSortable();
             if (this._insertAllButton !== null) {
-                if (this._target.querySelector(':scope > li:not(.uploadFailed)') !== null) {
+                if (this._target.querySelector(":scope > li:not(.uploadFailed)") !== null) {
                     DomUtil.show(this._insertAllButton);
                 }
                 else {
@@ -431,23 +437,26 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         }
         registerEditorButtons(attachment) {
             if (this._editorId) {
-                attachment.querySelectorAll('.jsButtonAttachmentInsertThumbnail, .jsButtonAttachmentInsertFull, .jsButtonAttachmentInsertPlain').forEach((button) => {
-                    button.addEventListener('click', (event) => this.insert(event));
+                attachment
+                    .querySelectorAll(".jsButtonAttachmentInsertThumbnail, .jsButtonAttachmentInsertFull, .jsButtonAttachmentInsertPlain")
+                    .forEach((button) => {
+                    button.addEventListener("click", (event) => this.insert(event));
                 });
             }
         }
         validateUpload(files) {
-            if (this._options.maxUploads === null || files.length + this._target.childElementCount <= this._options.maxUploads) {
+            if (this._options.maxUploads === null ||
+                files.length + this._target.childElementCount <= this._options.maxUploads) {
                 return true;
             }
             const parent = this._buttonContainer.parentElement;
-            let innerError = parent.querySelector('small.innerError:not(.innerFileError)');
+            let innerError = parent.querySelector("small.innerError:not(.innerFileError)");
             if (innerError === null) {
-                innerError = document.createElement('small');
-                innerError.className = 'innerError';
-                this._buttonContainer.insertAdjacentElement('afterend', innerError);
+                innerError = document.createElement("small");
+                innerError.className = "innerError";
+                this._buttonContainer.insertAdjacentElement("afterend", innerError);
             }
-            innerError.textContent = Language.get('wcf.upload.error.reachedRemainingLimit', {
+            innerError.textContent = Language.get("wcf.upload.error.reachedRemainingLimit", {
                 maxFiles: this._options.maxUploads - this._target.childElementCount,
             });
             return false;
@@ -489,16 +498,16 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         }
         _failure(uploadId, data) {
             this._fileElements[uploadId].forEach((fileElement) => {
-                fileElement.classList.add('uploadFailed');
-                const small = fileElement.querySelector('small');
+                fileElement.classList.add("uploadFailed");
+                const small = fileElement.querySelector("small");
                 small.innerHTML = "";
-                const icon = fileElement.querySelector('.icon');
-                icon.classList.remove('fa-spinner');
-                icon.classList.add('fa-ban');
-                const innerError = document.createElement('span');
-                innerError.className = 'innerError';
-                innerError.textContent = Language.get('wcf.upload.error.uploadFailed');
-                small.insertAdjacentElement('afterend', innerError);
+                const icon = fileElement.querySelector(".icon");
+                icon.classList.remove("fa-spinner");
+                icon.classList.add("fa-ban");
+                const innerError = document.createElement("span");
+                innerError.className = "innerError";
+                innerError.textContent = Language.get("wcf.upload.error.uploadFailed");
+                small.insertAdjacentElement("afterend", innerError);
             });
             throw new Error(`Upload failed: ${data.message}`);
         }
@@ -508,83 +517,83 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                     const fileData = data.returnValues.attachments[uploadId];
                     fileElement.dataset.objectId = fileData.attachmentID.toString();
                     fileElement.querySelector("small").textContent = fileData.formattedFilesize;
-                    const link = document.createElement('a');
+                    const link = document.createElement("a");
                     link.href = fileData.url;
-                    link.target = '_blank';
+                    link.target = "_blank";
                     link.textContent = fileData.filename;
                     const icon = fileElement.querySelector(".icon");
                     if (fileData.isImage) {
-                        const img = document.createElement('img');
+                        const img = document.createElement("img");
                         img.src = fileData.tinyURL ? fileData.tinyURL : fileData.url;
-                        img.alt = '';
-                        img.classList.add('attachmentTinyThumbnail');
+                        img.alt = "";
+                        img.classList.add("attachmentTinyThumbnail");
                         icon.replaceWith(img);
                         fileElement.dataset.height = fileData.height.toString();
                         fileElement.dataset.width = fileData.width.toString();
-                        fileElement.dataset.isImage = fileData.isImage ? '1' : '0';
-                        link.classList.add('jsImageViewer');
+                        fileElement.dataset.isImage = fileData.isImage ? "1" : "0";
+                        link.classList.add("jsImageViewer");
                         link.title = fileData.filename;
                     }
                     else {
                         icon.classList.remove("fa-spinner");
                         icon.classList.add(`fa-${fileData.iconName}`);
                     }
-                    const p = fileElement.querySelector('p');
-                    p.textContent = '';
+                    const p = fileElement.querySelector("p");
+                    p.textContent = "";
                     p.appendChild(link);
-                    const buttonGroup = fileElement.querySelector('.buttonGroup');
-                    let li = document.createElement('li');
-                    const deleteButton = document.createElement('span');
-                    deleteButton.classList.add('button', 'small', 'jsObjectAction');
-                    deleteButton.dataset.objectAction = 'delete';
-                    deleteButton.dataset.confirmMessage = Language.get('wcf.attachment.delete.sure');
-                    deleteButton.dataset.eventName = 'attachment';
-                    deleteButton.textContent = Language.get('wcf.global.button.delete');
+                    const buttonGroup = fileElement.querySelector(".buttonGroup");
+                    let li = document.createElement("li");
+                    const deleteButton = document.createElement("span");
+                    deleteButton.classList.add("button", "small", "jsObjectAction");
+                    deleteButton.dataset.objectAction = "delete";
+                    deleteButton.dataset.confirmMessage = Language.get("wcf.attachment.delete.sure");
+                    deleteButton.dataset.eventName = "attachment";
+                    deleteButton.textContent = Language.get("wcf.global.button.delete");
                     li.appendChild(deleteButton);
                     buttonGroup.appendChild(li);
                     if (this._editorId) {
                         if (fileData.tinyURL) {
                             if (fileData.thumbnailURL) {
-                                li = document.createElement('li');
-                                const insertThumbnailButton = document.createElement('span');
-                                insertThumbnailButton.classList.add('button', 'small', 'jsButtonAttachmentInsertThumbnail');
+                                li = document.createElement("li");
+                                const insertThumbnailButton = document.createElement("span");
+                                insertThumbnailButton.classList.add("button", "small", "jsButtonAttachmentInsertThumbnail");
                                 insertThumbnailButton.dataset.objectId = fileData.attachmentID.toString();
                                 insertThumbnailButton.dataset.url = fileData.thumbnailURL;
-                                insertThumbnailButton.textContent = Language.get('wcf.attachment.insertThumbnail');
+                                insertThumbnailButton.textContent = Language.get("wcf.attachment.insertThumbnail");
                                 li.appendChild(insertThumbnailButton);
                                 buttonGroup.appendChild(li);
                             }
-                            li = document.createElement('li');
-                            const insertImageButton = document.createElement('span');
-                            insertImageButton.classList.add('button', 'small', 'jsButtonAttachmentInsertFull');
+                            li = document.createElement("li");
+                            const insertImageButton = document.createElement("span");
+                            insertImageButton.classList.add("button", "small", "jsButtonAttachmentInsertFull");
                             insertImageButton.dataset.objectId = fileData.attachmentID.toString();
                             insertImageButton.dataset.url = fileData.url;
-                            insertImageButton.textContent = Language.get('wcf.attachment.insertFull');
+                            insertImageButton.textContent = Language.get("wcf.attachment.insertFull");
                             li.appendChild(insertImageButton);
                             buttonGroup.appendChild(li);
                         }
                         else {
-                            li = document.createElement('li');
-                            const insertButton = document.createElement('span');
-                            insertButton.classList.add('button', 'small', 'jsButtonAttachmentInsertPlain');
+                            li = document.createElement("li");
+                            const insertButton = document.createElement("span");
+                            insertButton.classList.add("button", "small", "jsButtonAttachmentInsertPlain");
                             insertButton.dataset.objectId = fileData.attachmentID.toString();
-                            insertButton.textContent = Language.get('wcf.attachment.insert');
+                            insertButton.textContent = Language.get("wcf.attachment.insert");
                             li.appendChild(insertButton);
                             buttonGroup.appendChild(li);
                         }
                     }
-                    this.triggerSync('new', {
+                    this.triggerSync("new", {
                         html: fileElement.outerHTML,
                     });
                     this.registerEditorButtons(fileElement);
                     if (Object.hasOwnProperty.call(this._replaceOnLoad, uploadId)) {
-                        if (!fileElement.classList.contains('uploadFailed')) {
+                        if (!fileElement.classList.contains("uploadFailed")) {
                             const img = this._replaceOnLoad[uploadId];
                             if (img && img.parentNode) {
-                                EventHandler.fire('com.woltlab.wcf.redactor2', 'replaceAttachment_' + this._editorId, {
+                                EventHandler.fire("com.woltlab.wcf.redactor2", "replaceAttachment_" + this._editorId, {
                                     attachmentId: fileData.attachmentID,
                                     img: img,
-                                    src: (fileData.thumbnailURL) ? fileData.thumbnailURL : fileData.url,
+                                    src: fileData.thumbnailURL ? fileData.thumbnailURL : fileData.url,
                                 });
                             }
                         }
@@ -615,13 +624,13 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                 }
                 if (this._autoInsert.includes(uploadId)) {
                     this._autoInsert.splice(this._autoInsert.indexOf(uploadId), 1);
-                    if (!fileElement.classList.contains('uploadFailed')) {
-                        let button = fileElement.querySelector('.jsButtonAttachmentInsertThumbnail');
+                    if (!fileElement.classList.contains("uploadFailed")) {
+                        let button = fileElement.querySelector(".jsButtonAttachmentInsertThumbnail");
                         if (button === null) {
-                            button = fileElement.querySelector('.jsButtonAttachmentInsertFull');
+                            button = fileElement.querySelector(".jsButtonAttachmentInsertFull");
                         }
                         if (button !== null) {
-                            button.dispatchEvent(new MouseEvent('click'));
+                            button.dispatchEvent(new MouseEvent("click"));
                         }
                     }
                 }
@@ -629,13 +638,13 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             // create delete buttons
             this.checkMaxFiles();
             this.makeSortable();
-            Core.triggerEvent(this._target, 'change');
+            Core.triggerEvent(this._target, "change");
         }
         triggerSync(type, data) {
-            EventHandler.fire('com.woltlab.wcf.redactor2', 'sync_' + this._tmpHash, {
+            EventHandler.fire("com.woltlab.wcf.redactor2", "sync_" + this._tmpHash, {
                 source: this,
                 type: type,
-                data: data
+                data: data,
             });
         }
     }
