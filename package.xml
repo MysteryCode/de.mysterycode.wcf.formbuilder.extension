@@ -29,7 +29,9 @@
 		<instruction type="template" />
 	</instructions>
 
-	<instructions type="update" fromversion="1.2.1">
+	<instructions type="update" fromversion="1.2.*">
 		<instruction type="file" />
+		<instruction type="acpTemplate" />
+		<instruction type="template" />
 	</instructions>
 </package>
