@@ -23,6 +23,12 @@ use wcf\system\WCF;
 use wcf\util\ArrayUtil;
 use wcf\util\StringUtil;
 
+/**
+ * i18n implementation of WysiwygFormField
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCI18nWysiwygFormField extends WysiwygFormField implements II18nFormField
 {
     /**

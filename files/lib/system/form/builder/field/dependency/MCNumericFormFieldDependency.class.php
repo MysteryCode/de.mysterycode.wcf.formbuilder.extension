@@ -4,6 +4,12 @@ namespace wcf\system\form\builder\field\dependency;
 
 use InvalidArgumentException;
 
+/**
+ * Dependency handling numeric form fields using several operators.
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCNumericFormFieldDependency extends AbstractFormFieldDependency
 {
     /**

@@ -3,13 +3,10 @@
 namespace wcf\system\form\builder\field;
 
 /**
- * Implementation of a form field for single-line text values.
+ * Shows the field's label and a given text instead of an input
  *
- * @author    Matthias Schmidt
- * @copyright    2001-2019 WoltLab GmbH
- * @license    GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
- * @package    WoltLabSuite\Core\System\Form\Builder\Field
- * @since    5.2
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
  */
 class MCTextDisplayFormField extends AbstractFormField
 {

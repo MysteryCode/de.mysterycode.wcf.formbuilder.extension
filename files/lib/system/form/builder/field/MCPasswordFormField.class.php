@@ -11,13 +11,11 @@ use wcf\util\JSON;
 use wcf\util\StringUtil;
 
 /**
- * Implementation of a form field for single-line text values.
+ * Implementation of a form field for passwords.
  *
- * @author    Matthias Schmidt
+ * @author       Matthias Schmidt, Florian Gail
  * @copyright    2001-2019 WoltLab GmbH
- * @license    GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
- * @package    WoltLabSuite\Core\System\Form\Builder\Field
- * @since    5.2
+ * @license      GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
  */
 class MCPasswordFormField extends AbstractFormField implements
     IAutoFocusFormField,

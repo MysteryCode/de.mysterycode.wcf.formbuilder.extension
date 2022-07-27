@@ -8,6 +8,12 @@ use wcf\system\form\builder\IFormDocument;
 use wcf\system\WCF;
 use wcf\util\StringUtil;
 
+/**
+ * i18n implementation of WysiwygFormContainer
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCAttachmentFormField extends AbstractFormField
 {
     /**

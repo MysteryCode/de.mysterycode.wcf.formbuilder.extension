@@ -4,6 +4,12 @@ namespace wcf\system\form\builder\field;
 
 use wcf\system\WCF;
 
+/**
+ * Implementation of SingleSelectionFormField supporting "noSelection" as option without the need to add it manually
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCEmptySingleSelectionFormField extends SingleSelectionFormField
 {
     /**

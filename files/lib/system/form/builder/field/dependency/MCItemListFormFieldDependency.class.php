@@ -5,6 +5,12 @@ namespace wcf\system\form\builder\field\dependency;
 use BadMethodCallException;
 use InvalidArgumentException;
 
+/**
+ * Dependency handling UiItemList-based fields as requirement.
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCItemListFormFieldDependency extends AbstractFormFieldDependency
 {
     /**

@@ -6,6 +6,12 @@ use BadMethodCallException;
 use wcf\system\form\builder\IFormNode;
 use wcf\util\StringUtil;
 
+/**
+ * Form field providing a badge-color selection with live preview
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCBadgeColorFormField extends AbstractFormField implements
     IAutoFocusFormField,
     IImmutableFormField,

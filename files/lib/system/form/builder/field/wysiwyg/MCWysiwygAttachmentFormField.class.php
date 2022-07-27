@@ -10,6 +10,12 @@ use wcf\system\form\builder\TWysiwygFormNode;
 use wcf\system\WCF;
 use wcf\util\StringUtil;
 
+/**
+ * A better implementation of the attachment field in WysiwygContainers
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCWysiwygAttachmentFormField extends AbstractFormField
 {
     use TWysiwygFormNode;

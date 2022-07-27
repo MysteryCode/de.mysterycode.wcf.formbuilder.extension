@@ -11,6 +11,12 @@ use wcf\system\event\EventHandler;
 use wcf\system\exception\SystemException;
 use wcf\system\form\builder\field\MCAttachmentFormField;
 
+/**
+ * Container providing the possiblity to upload attachmetns without the need of an wysiwyg-editor
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCAttachmentFormContainer extends FormContainer
 {
     /**

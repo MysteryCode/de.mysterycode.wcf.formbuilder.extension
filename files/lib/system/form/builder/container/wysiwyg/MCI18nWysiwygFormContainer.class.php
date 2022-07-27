@@ -13,6 +13,12 @@ use wcf\system\form\builder\field\wysiwyg\MCI18nWysiwygFormField;
 use wcf\system\form\builder\field\wysiwyg\WysiwygAttachmentFormField;
 use wcf\system\Regex;
 
+/**
+ * i18n implementation of WysiwygFormContainer
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCI18nWysiwygFormContainer extends WysiwygFormContainer
 {
     /**

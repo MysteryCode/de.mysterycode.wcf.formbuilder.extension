@@ -10,6 +10,12 @@ use wcf\system\form\builder\field\IFormField;
 use wcf\system\form\builder\IFormDocument;
 use wcf\system\form\builder\IFormNode;
 
+/**
+ * Container grouping it's children's data into an array
+ *
+ * @author      Florian Gail
+ * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ */
 class MCPrefixedFormDataProcessor extends AbstractFormDataProcessor
 {
     /**
