@@ -83,7 +83,7 @@ trait TI18nDatabaseObjectAction
 
         if (!empty($values)) {
             I18nHandler::getInstance()->save($values, $languageItem, $languageItemCategory, $packageID);
-            if ($object->$propertyName !== $languageItem) {
+            if ($object->{$propertyName} !== $languageItem) {
                 $className = $this->getClassName();
                 (new $className($object))->update([
                     $propertyName => $languageItem,
