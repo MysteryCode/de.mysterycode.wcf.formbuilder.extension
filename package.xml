@@ -29,7 +29,7 @@
 		<instruction type="template" />
 	</instructions>
 
-	<instructions type="update" fromversion="1.2.*">
+	<instructions type="update" fromversion="1.*">
 		<instruction type="file" />
 		<instruction type="acpTemplate" />
 		<instruction type="template" />
