@@ -59,7 +59,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
       Core.extend(
         {
           multiple: true,
-          className: "wcf\\data\\attachment\\VieCodeShopAttachmentAction",
+          className: "wcf\\data\\attachment\\AttachmentAction",
           maxUploads: maxUploads,
           singleFileRequests: true,
           objectType: objectType,
@@ -311,9 +311,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
           .then((resizedFile: File) => {
             if (resizedFile.size > file!.size) {
               console.debug(
-                `[VieCode/Shop/Ui/Attachment/Upload] File size of "${
-                  file!.name
-                }" increased, uploading untouched image.`,
+                `[MysteryCode/Ui/Attachment/Upload] File size of "${file!.name}" increased, uploading untouched image.`,
               );
               return file;
             }
@@ -322,7 +320,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
           });
       })
       .catch((error) => {
-        console.debug(`[VieCode/Shop/Ui/Attachment/Upload] Failed to resize image "${file!.name}":`, error);
+        console.debug(`[MysteryCode/Ui/Attachment/Upload] Failed to resize image "${file!.name}":`, error);
         return file;
       })
       .then((file) => {
@@ -436,7 +434,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
                 Ajax.apiOnce({
                   data: {
                     actionName: "updatePosition",
-                    className: "wcf\\data\\attachment\\VieCodeShopAttachmentAction",
+                    className: "wcf\\data\\attachment\\AttachmentAction",
                     parameters: {
                       attachmentIDs: attachmentIDs,
                       objectID: this._objectID,
@@ -622,9 +620,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
       innerError.remove();
     }
 
-    const result = super._upload(event, file, blob);
-
-    return result;
+    return super._upload(event, file, blob);
   }
 
   protected _createFileElement(file: File | FileLikeObject): HTMLElement {

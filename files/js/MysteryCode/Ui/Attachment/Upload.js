@@ -22,7 +22,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         constructor(buttonContainerId, targetId, objectType, objectID, tmpHash, parentObjectID, maxUploads, editorId, options) {
             super(buttonContainerId, targetId, Core.extend({
                 multiple: true,
-                className: "wcf\\data\\attachment\\VieCodeShopAttachmentAction",
+                className: "wcf\\data\\attachment\\AttachmentAction",
                 maxUploads: maxUploads,
                 singleFileRequests: true,
                 objectType: objectType,
@@ -216,14 +216,14 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                 })
                     .then((resizedFile) => {
                     if (resizedFile.size > file.size) {
-                        console.debug(`[VieCode/Shop/Ui/Attachment/Upload] File size of "${file.name}" increased, uploading untouched image.`);
+                        console.debug(`[MysteryCode/Ui/Attachment/Upload] File size of "${file.name}" increased, uploading untouched image.`);
                         return file;
                     }
                     return resizedFile;
                 });
             })
                 .catch((error) => {
-                console.debug(`[VieCode/Shop/Ui/Attachment/Upload] Failed to resize image "${file.name}":`, error);
+                console.debug(`[MysteryCode/Ui/Attachment/Upload] Failed to resize image "${file.name}":`, error);
                 return file;
             })
                 .then((file) => {
@@ -318,7 +318,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                                 Ajax.apiOnce({
                                     data: {
                                         actionName: "updatePosition",
-                                        className: "wcf\\data\\attachment\\VieCodeShopAttachmentAction",
+                                        className: "wcf\\data\\attachment\\AttachmentAction",
                                         parameters: {
                                             attachmentIDs: attachmentIDs,
                                             objectID: this._objectID,
@@ -467,8 +467,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             if (innerError) {
                 innerError.remove();
             }
-            const result = super._upload(event, file, blob);
-            return result;
+            return super._upload(event, file, blob);
         }
         _createFileElement(file) {
             DomUtil.show(this._target);

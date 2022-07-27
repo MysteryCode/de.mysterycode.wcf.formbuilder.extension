@@ -5,8 +5,8 @@
 		<packagename language="de"><![CDATA[Form Builder: Erweiterung]]></packagename>
 		<packagedescription><![CDATA[Extension for the form builder API.]]></packagedescription>
 		<packagedescription language="de"><![CDATA[Erweiterung für die Form Builder-API.]]></packagedescription>
-		<version>1.2.2</version>
-		<date><![CDATA[2022-07-26]]></date>
+		<version>1.2.3 Dev 1</version>
+		<date><![CDATA[2022-07-27]]></date>
         <license><![CDATA[Lesser General Public License (LGPL)]]></license>
 	</packageinformation>
 
@@ -29,7 +29,7 @@
 		<instruction type="template" />
 	</instructions>
 
-	<instructions type="update" fromversion="1.*">
+	<instructions type="update" fromversion="*">
 		<instruction type="file" />
 		<instruction type="acpTemplate" />
 		<instruction type="template" />
