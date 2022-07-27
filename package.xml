@@ -5,7 +5,7 @@
 		<packagename language="de"><![CDATA[Form Builder: Erweiterung]]></packagename>
 		<packagedescription><![CDATA[Extension for the form builder API.]]></packagedescription>
 		<packagedescription language="de"><![CDATA[Erweiterung für die Form Builder-API.]]></packagedescription>
-		<version>1.2.3 Dev 1</version>
+		<version>1.2.3</version>
 		<date><![CDATA[2022-07-27]]></date>
         <license><![CDATA[Lesser General Public License (LGPL)]]></license>
 	</packageinformation>
