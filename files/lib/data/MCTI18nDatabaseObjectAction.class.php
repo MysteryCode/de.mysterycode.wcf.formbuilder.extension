@@ -13,7 +13,7 @@ use wcf\util\StringUtil;
  *
  * @notice meant to be used in extensions of `AbstractDatabaseObjectAction` only
  */
-trait TI18nDatabaseObjectAction
+trait MCTI18nDatabaseObjectAction
 {
     /**
      * @param    string         $propertyName

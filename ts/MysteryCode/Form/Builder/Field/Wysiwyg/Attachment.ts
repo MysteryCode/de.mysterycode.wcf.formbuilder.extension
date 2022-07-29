@@ -9,14 +9,11 @@
  */
 
 import Value from "WoltLabSuite/Core/Form/Builder/Field/Value";
-import * as Core from "WoltLabSuite/Core/Core";
 
-class Attachment extends Value {
+export class Attachment extends Value {
   constructor(fieldId: string) {
     super(fieldId + "_tmpHash");
   }
 }
 
-Core.enableLegacyInheritance(Attachment);
-
-export = Attachment;
+export default Attachment;

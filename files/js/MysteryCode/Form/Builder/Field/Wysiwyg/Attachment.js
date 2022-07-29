@@ -7,15 +7,16 @@
  * @module  MysteryCode/Form/Builder/Field/Field/Wysiwyg/Attachment
  * @since 5.2
  */
-define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Value", "WoltLabSuite/Core/Core"], function (require, exports, tslib_1, Value_1, Core) {
+define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Value"], function (require, exports, tslib_1, Value_1) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Attachment = void 0;
     Value_1 = tslib_1.__importDefault(Value_1);
-    Core = tslib_1.__importStar(Core);
     class Attachment extends Value_1.default {
         constructor(fieldId) {
             super(fieldId + "_tmpHash");
         }
     }
-    Core.enableLegacyInheritance(Attachment);
-    return Attachment;
+    exports.Attachment = Attachment;
+    exports.default = Attachment;
 });
