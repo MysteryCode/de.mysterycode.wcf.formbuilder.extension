@@ -19,6 +19,14 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
     Environment = tslib_1.__importStar(Environment);
     FileUtil = tslib_1.__importStar(FileUtil);
     class AttachmentUpload extends Upload_1.default {
+        _editorId;
+        _tmpHash;
+        _objectID;
+        _parentObjectID;
+        _insertAllButton;
+        _autoInsert = [];
+        _replaceOnLoad = {};
+        _resizer = null;
         constructor(buttonContainerId, targetId, objectType, objectID, tmpHash, parentObjectID, maxUploads, editorId, options) {
             super(buttonContainerId, targetId, Core.extend({
                 multiple: true,
@@ -27,9 +35,6 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                 singleFileRequests: true,
                 objectType: objectType,
             }, options));
-            this._autoInsert = [];
-            this._replaceOnLoad = {};
-            this._resizer = null;
             this._objectID = objectID;
             this._tmpHash = tmpHash;
             this._parentObjectID = parentObjectID;
@@ -273,7 +278,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                     if (button === null) {
                         button = attachment.querySelector(".jsButtonAttachmentInsertFull, .jsButtonAttachmentInsertPlain");
                     }
-                    button === null || button === void 0 ? void 0 : button.dispatchEvent(new MouseEvent("click"));
+                    button?.dispatchEvent(new MouseEvent("click"));
                 }
             }
         }

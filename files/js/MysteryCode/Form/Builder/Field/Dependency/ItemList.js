@@ -17,10 +17,9 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Dep
         State[State["NonEmpty"] = 2] = "NonEmpty";
     })(State || (State = {}));
     class ItemList extends Abstract_1.default {
-        constructor() {
-            super(...arguments);
-            this._values = null;
-        }
+        _values = null;
+        _state;
+        _isNegated;
         /**
          * Sets if the field value may not have any of the set values.
          */

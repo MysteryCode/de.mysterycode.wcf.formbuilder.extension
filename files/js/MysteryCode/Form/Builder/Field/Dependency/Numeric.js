@@ -10,11 +10,8 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Dep
     exports.Numeric = void 0;
     Abstract_1 = tslib_1.__importDefault(Abstract_1);
     class Numeric extends Abstract_1.default {
-        constructor() {
-            super(...arguments);
-            this._referenceValue = null;
-            this._operator = null;
-        }
+        _referenceValue = null;
+        _operator = null;
         referenceValue(referenceValue) {
             this._referenceValue = referenceValue;
             return this;

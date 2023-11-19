@@ -9,6 +9,9 @@ define(["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LabelPreviewHandler = void 0;
     class LabelPreviewHandler {
+        _defaultText;
+        _dependentElement;
+        _field;
         constructor(dependentElementId, fieldId, defaultText) {
             this._defaultText = defaultText;
             this._dependentElement = document.getElementById(dependentElementId);
