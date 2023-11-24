@@ -20,11 +20,6 @@ class MCWysiwygAttachmentFormField extends AbstractFormField
 {
     use TWysiwygFormNode;
 
-    /**
-     * attachment handler
-     *
-     * @var null|AttachmentHandler
-     */
     protected ?AttachmentHandler $attachmentHandler;
 
     /**
@@ -60,13 +55,11 @@ class MCWysiwygAttachmentFormField extends AbstractFormField
     public function attachmentHandler(?AttachmentHandler $attachmentHandler = null): self
     {
         if ($attachmentHandler !== null) {
-            if (empty($this->attachmentHandler)) {
+            if (!isset($this->attachmentHandler)) {
                 $tmpHash = StringUtil::getRandomID();
-
                 if ($this->getDocument()->isAjax()) {
                     /** @deprecated 5.5 see QuickReplyManager::setTmpHash() */
                     $sessionTmpHash = WCF::getSession()->getVar('__wcfAttachmentTmpHash');
-
                     if ($sessionTmpHash !== null) {
                         $tmpHash = $sessionTmpHash;
 
@@ -84,7 +77,9 @@ class MCWysiwygAttachmentFormField extends AbstractFormField
         $this->attachmentHandler = $attachmentHandler;
 
         if ($this->attachmentHandler !== null) {
-            $this->description('wcf.attachment.upload.limits', ['attachmentHandler' => $this->attachmentHandler]);
+            $this->description('wcf.attachment.upload.limits', [
+                'attachmentHandler' => $this->attachmentHandler,
+            ]);
         } else {
             $this->description();
         }
@@ -95,8 +90,6 @@ class MCWysiwygAttachmentFormField extends AbstractFormField
     /**
      * Returns the attachment handler object for the uploaded attachments or `null` if no attachment
      * upload is supported.
-     *
-     * @return null|AttachmentHandler
      */
     public function getAttachmentHandler(): ?AttachmentHandler
     {
@@ -128,15 +121,16 @@ class MCWysiwygAttachmentFormField extends AbstractFormField
     {
         parent::populate();
 
-        $this->getDocument()->getDataHandler()->addProcessor(
-            new CustomFormDataProcessor($this->getId(), function (IFormDocument $document, array $parameters) {
+        $this->getDocument()->getDataHandler()->addProcessor(new CustomFormDataProcessor(
+            $this->getId(),
+            function (IFormDocument $document, array $parameters) {
                 if ($this->getAttachmentHandler() !== null) {
                     $parameters[$this->getWysiwygId() . '_attachmentHandler'] = $this->getAttachmentHandler();
                 }
 
                 return $parameters;
-            })
-        );
+            }
+        ));
 
         return $this;
     }
