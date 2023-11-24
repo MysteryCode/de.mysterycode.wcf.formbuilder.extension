@@ -180,13 +180,13 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param null|string $index quote data index
      * @return  string[]|string
      *
-     * @throws  \BadMethodCallException     if quotes are not supported for this field
-     * @throws  \InvalidArgumentException   if unknown quote data is requested
+     * @throws  BadMethodCallException     if quotes are not supported for this field
+     * @throws  InvalidArgumentException   if unknown quote data is requested
      */
     public function getQuoteData($index = null)
     {
         if (!$this->supportQuotes()) {
-            throw new \BadMethodCallException("Quotes are not supported for field '{$this->getId()}'.");
+            throw new BadMethodCallException("Quotes are not supported for field '{$this->getId()}'.");
         }
 
         if ($index === null) {
@@ -194,7 +194,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
         }
 
         if (!isset($this->quoteData[$index])) {
-            throw new \InvalidArgumentException("Unknown quote data '{$index}' for field '{$this->getId()}'.");
+            throw new InvalidArgumentException("Unknown quote data '{$index}' for field '{$this->getId()}'.");
         }
 
         return $this->quoteData[$index];
@@ -236,7 +236,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param string[] $selectors selectors for the quotable content (required keys: `container`, `messageBody`, and `messageContent`)
      * @return  static
      *
-     * @throws  \InvalidArgumentException   if any of the given arguments is invalid
+     * @throws  InvalidArgumentException   if any of the given arguments is invalid
      */
     public function quoteData($objectType, $actionClass, array $selectors = [])
     {
@@ -246,16 +246,16 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
                 $objectType
             ) === null
         ) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Unknown message quote object type '{$objectType}' for field '{$this->getId()}'."
             );
         }
 
         if (!\class_exists($actionClass)) {
-            throw new \InvalidArgumentException("Unknown class '{$actionClass}' for field '{$this->getId()}'.");
+            throw new InvalidArgumentException("Unknown class '{$actionClass}' for field '{$this->getId()}'.");
         }
         if (!\is_subclass_of($actionClass, IMessageQuoteAction::class)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "'{$actionClass}' does not implement '" . IMessageQuoteAction::class . "' for field '{$this->getId()}'."
             );
         }
@@ -263,7 +263,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
         if (!empty($selectors)) {
             foreach (['container', 'messageBody', 'messageContent'] as $selector) {
                 if (!isset($selectors[$selector])) {
-                    throw new \InvalidArgumentException("Missing selector '{$selector}' for field '{$this->getId()}'.");
+                    throw new InvalidArgumentException("Missing selector '{$selector}' for field '{$this->getId()}'.");
                 }
             }
         }
@@ -745,7 +745,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
                 ) {
                     if ($this->hasPlainValue()) {
                         $errorEmpty = true;
-                        //$this->addValidationError(new FormFieldValidationError('empty'));
+                    //$this->addValidationError(new FormFieldValidationError('empty'));
                     } else {
                         $errorMultilingual = true;
                         //$this->addValidationError(new FormFieldValidationError('multilingual'));

@@ -21,6 +21,8 @@ use wcf\system\form\builder\IFormChildNode;
 use wcf\system\form\builder\TWysiwygFormNode;
 use wcf\system\Regex;
 
+use const MODULE_SMILEY;
+
 /**
  * i18n implementation of WysiwygFormContainer
  *
@@ -96,7 +98,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
     {
         // the actual id is used for the form field containing the text
         return parent::create($id . 'Container')
-                ->addClass('mcWysiwygContainer');
+            ->addClass('mcWysiwygContainer');
     }
 
     /**
@@ -136,16 +138,16 @@ class MCI18nWysiwygFormContainer extends FormContainer
      *
      * By default, no attachment data is set.
      *
-     * @throws  \BadMethodCallException         if the attachment form field has already been initialized
+     * @throws  BadMethodCallException         if the attachment form field has already been initialized
      */
     public function attachmentData(?string $objectType = null, int $parentObjectID = 0): static
     {
         if (isset($this->attachmentField)) {
-            throw new \BadMethodCallException("The attachment form field '{$this->getId()}' has already been initialized. Use the atatchment form field directly to manipulate attachment data.");
+            throw new BadMethodCallException("The attachment form field '{$this->getId()}' has already been initialized. Use the atatchment form field directly to manipulate attachment data.");
         }
 
         if ($objectType === null) {
-            unset($this->attachmentData);
+            $this->attachmentData = null;
         } else {
             if (
                 ObjectTypeCache::getInstance()->getObjectTypeByName(
@@ -153,7 +155,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
                     $objectType
                 ) === null
             ) {
-                throw new \InvalidArgumentException("Unknown attachment object type '{$objectType}' for container '{$this->getId()}'.");
+                throw new InvalidArgumentException("Unknown attachment object type '{$objectType}' for container '{$this->getId()}'.");
             }
 
             $this->attachmentData = [
@@ -170,12 +172,12 @@ class MCI18nWysiwygFormContainer extends FormContainer
      *
      * By default, the preview button is shown.
      *
-     * @throws      \BadMethodCallException         if the form field container has already been populated yet
+     * @throws      BadMethodCallException         if the form field container has already been populated yet
      */
     public function enablePreviewButton(bool $enablePreviewButton = true): static
     {
         if ($this->isPopulated) {
-            throw new \BadMethodCallException(
+            throw new BadMethodCallException(
                 "Enabling and disabling the preview button is only possible before the form has been built for container '{$this->getId()}'."
             );
         }
@@ -188,12 +190,12 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Returns the form field handling attachments.
      *
-     * @throws  \BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
+     * @throws  BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
      */
     public function getAttachmentField(): MCWysiwygAttachmentFormField
     {
         if (!isset($this->attachmentField)) {
-            throw new \BadMethodCallException(
+            throw new BadMethodCallException(
                 "Wysiwyg form field can only be requested after the form has been built for container '{$this->getId()}'."
             );
         }
@@ -223,12 +225,12 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Returns the wysiwyg form container with all poll-related fields.
      *
-     * @throws  \BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
+     * @throws  BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
      */
     public function getPollContainer(): WysiwygPollFormContainer
     {
         if (!isset($this->pollContainer)) {
-            throw new \BadMethodCallException(
+            throw new BadMethodCallException(
                 "Wysiwyg form field can only be requested after the form has been built for container '{$this->getId()}'."
             );
         }
@@ -239,12 +241,12 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Returns the form container for all settings-related fields.
      *
-     * @throws  \BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
+     * @throws  BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
      */
     public function getSettingsContainer(): FormContainer
     {
         if (!isset($this->settingsContainer)) {
-            throw new \BadMethodCallException(
+            throw new BadMethodCallException(
                 "Wysiwyg form field can only be requested after the form has been built for container '{$this->getId()}'."
             );
         }
@@ -255,12 +257,12 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Returns the form container for smiley categories.
      *
-     * @throws  \BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
+     * @throws  BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
      */
     public function getSmiliesContainer(): WysiwygSmileyFormContainer
     {
         if (!isset($this->smiliesContainer)) {
-            throw new \BadMethodCallException(
+            throw new BadMethodCallException(
                 "Smilies form field container can only be requested after the form has been built for container '{$this->getId()}'."
             );
         }
@@ -308,7 +310,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Sets the message object type used by the wysiwyg form field.
      *
-     * @throws  \InvalidArgumentException       if the given string is no message object type
+     * @throws  InvalidArgumentException       if the given string is no message object type
      */
     public function messageObjectType(string $messageObjectType): static
     {
@@ -318,7 +320,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
                 $messageObjectType
             ) === null
         ) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Unknown message object type '{$messageObjectType}' for container '{$this->getId()}'."
             );
         }
@@ -349,12 +351,12 @@ class MCI18nWysiwygFormContainer extends FormContainer
      *
      * By default, no poll object type is set, thus the poll form field container is not available.
      *
-     * @throws  \InvalidArgumentException       if the given string is no poll object type
+     * @throws  InvalidArgumentException       if the given string is no poll object type
      */
     public function pollObjectType(string $pollObjectType): static
     {
         if (ObjectTypeCache::getInstance()->getObjectTypeByName('com.woltlab.wcf.poll', $pollObjectType) === null) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Unknown poll object type '{$pollObjectType}' for container '{$this->getId()}'."
             );
         }
@@ -474,7 +476,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
      */
     public function supportSmilies(bool $supportSmilies = true): static
     {
-        if (!\MODULE_SMILEY) {
+        if (!MODULE_SMILEY) {
             $supportSmilies = false;
         }
 
@@ -495,7 +497,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
     public function getWysiwygField(): MCI18nWysiwygFormField
     {
         if (!isset($this->wysiwygField)) {
-            throw new \BadMethodCallException(
+            throw new BadMethodCallException(
                 "Wysiwyg form field can only be requested after the form has been built for container '{$this->getId()}'."
             );
         }
