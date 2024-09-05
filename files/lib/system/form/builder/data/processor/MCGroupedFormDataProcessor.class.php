@@ -78,7 +78,8 @@ class MCGroupedFormDataProcessor extends AbstractFormDataProcessor
             return;
         }
 
-        unset($parameters['data'][$id]);
+        unset($parameters['data'][$node->getId()]);
+
         $parameters[$node->getId()] = $node->getValue();
     }
 

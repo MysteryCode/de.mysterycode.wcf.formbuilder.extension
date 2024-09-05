@@ -20,6 +20,7 @@ use wcf\system\form\builder\field\TMaximumLengthFormField;
 use wcf\system\form\builder\field\TMinimumLengthFormField;
 use wcf\system\form\builder\field\validation\FormFieldValidationError;
 use wcf\system\form\builder\IFormDocument;
+use wcf\system\form\builder\IFormNode;
 use wcf\system\form\builder\IObjectTypeFormNode;
 use wcf\system\form\builder\TObjectTypeFormNode;
 use wcf\system\html\input\HtmlInputProcessor;
@@ -102,9 +103,9 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * Sets the identifier used to autosave the field value and returns this field.
      *
      * @param string $autosaveId identifier used to autosave field value
-     * @return  WysiwygFormField        this field
+     * @return  WysiwygFormField|MCI18nWysiwygFormField        this field
      */
-    public function autosaveId($autosaveId)
+    public function autosaveId(string $autosaveId): WysiwygFormField|self
     {
         $this->autosaveId = $autosaveId;
 
@@ -113,6 +114,8 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
     public function cleanup(): static
     {
@@ -127,15 +130,17 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @return  string
      */
-    public function getAutosaveId()
+    public function getAutosaveId(): string
     {
         return $this->autosaveId;
     }
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
-    public function getFieldHtml()
+    public function getFieldHtml(): string
     {
         if ($this->supportsQuotes()) {
             MessageQuoteManager::getInstance()->assignVariables();
@@ -143,6 +148,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
 
         /** @noinspection PhpUndefinedFieldInspection */
         $disallowedBBCodesPermission = $this->getObjectType()->disallowedBBCodesPermission;
+
         if ($disallowedBBCodesPermission === null) {
             $disallowedBBCodesPermission = 'user.message.disallowedBBCodes';
         }
@@ -158,7 +164,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
     /**
      * @inheritDoc
      */
-    public function getObjectTypeDefinition()
+    public function getObjectTypeDefinition(): string
     {
         return 'com.woltlab.wcf.message';
     }
@@ -169,7 +175,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @return  int
      */
-    public function getLastEditTime()
+    public function getLastEditTime(): int
     {
         return $this->lastEditTime;
     }
@@ -177,13 +183,14 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
     /**
      * Returns all quote data or specific quote data if an argument is given.
      *
-     * @param null|string $index quote data index
-     * @return  string[]|string
+     * @param string|null $index quote data index
+     * @return  string[]|string|null
      *
      * @throws  BadMethodCallException     if quotes are not supported for this field
      * @throws  InvalidArgumentException   if unknown quote data is requested
+     * @throws SystemException
      */
-    public function getQuoteData($index = null)
+    public function getQuoteData(?string $index = null): array|string|null
     {
         if (!$this->supportQuotes()) {
             throw new BadMethodCallException("Quotes are not supported for field '{$this->getId()}'.");
@@ -202,6 +209,8 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
     public function getSaveValue()
     {
@@ -216,9 +225,9 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * Sets the last time this field has been edited and returns this field.
      *
      * @param int $lastEditTime last time field has been edited
-     * @return  WysiwygFormField    this field
+     * @return  WysiwygFormField|MCI18nWysiwygFormField    this field
      */
-    public function lastEditTime($lastEditTime)
+    public function lastEditTime(int $lastEditTime): WysiwygFormField|self
     {
         $this->lastEditTime = $lastEditTime;
 
@@ -236,9 +245,9 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param string[] $selectors selectors for the quotable content (required keys: `container`, `messageBody`, and `messageContent`)
      * @return  static
      *
-     * @throws  InvalidArgumentException   if any of the given arguments is invalid
+     * @throws SystemException
      */
-    public function quoteData($objectType, $actionClass, array $selectors = [])
+    public function quoteData(string $objectType, string $actionClass, array $selectors = []): self
     {
         if (
             ObjectTypeCache::getInstance()->getObjectTypeByName(
@@ -283,9 +292,9 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * Sets if the form field supports attachments and returns this field.
      *
      * @param bool $supportAttachments
-     * @return  WysiwygFormField        this field
+     * @return  WysiwygFormField|MCI18nWysiwygFormField        this field
      */
-    public function supportAttachments($supportAttachments = true)
+    public function supportAttachments(bool $supportAttachments = true): WysiwygFormField|self
     {
         $this->supportAttachments = $supportAttachments;
 
@@ -296,9 +305,9 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * Sets if the form field supports mentions and returns this field.
      *
      * @param bool $supportMentions
-     * @return  WysiwygFormField        this field
+     * @return  WysiwygFormField|MCI18nWysiwygFormField        this field
      */
-    public function supportMentions($supportMentions = true)
+    public function supportMentions(bool $supportMentions = true): WysiwygFormField|self
     {
         $this->supportMentions = $supportMentions;
 
@@ -309,9 +318,11 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * Sets if the form field supports quotes and returns this field.
      *
      * @param bool $supportQuotes
-     * @return  WysiwygFormField        this field
+     * @return  WysiwygFormField|MCI18nWysiwygFormField        this field
+     *
+     * @throws SystemException
      */
-    public function supportQuotes($supportQuotes = true)
+    public function supportQuotes(bool $supportQuotes = true): WysiwygFormField|self
     {
         $this->supportQuotes = $supportQuotes;
 
@@ -337,7 +348,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @return  bool
      */
-    public function supportsAttachments()
+    public function supportsAttachments(): bool
     {
         return $this->supportAttachments;
     }
@@ -349,7 +360,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @return  bool
      */
-    public function supportsMentions()
+    public function supportsMentions(): bool
     {
         return $this->supportMentions;
     }
@@ -361,7 +372,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @return  bool
      */
-    public function supportsQuotes()
+    public function supportsQuotes(): bool
     {
         return $this->supportQuotes;
     }
@@ -462,7 +473,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @throws SystemException
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         if ($this->isI18n()) {
             if ($this->hasI18nValues()) {
@@ -471,11 +482,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
                 // handle legacy values from the past when multilingual values
                 // were available
                 if (\count(LanguageFactory::getInstance()->getLanguages()) === 1) {
-                    if (isset($values[WCF::getLanguage()->languageID])) {
-                        return $values[WCF::getLanguage()->languageID];
-                    }
-
-                    return \current($values);
+                    return $values[WCF::getLanguage()->languageID] ?? \current($values);
                 }
 
                 return $values;
@@ -497,7 +504,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param bool $i18n determines if field supports i18n input
      * @return static this field
      */
-    public function i18n($i18n = true): self
+    public function i18n(bool $i18n = true): self
     {
         //if ($this->javaScriptDataHandlerModule) {
         //    if ($this->isI18n() && !$i18n) {
@@ -523,7 +530,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param bool $i18nRequired determines if field value must be i18n input
      * @return static this field
      */
-    public function i18nRequired($i18nRequired = true): self
+    public function i18nRequired(bool $i18nRequired = true): self
     {
         $this->i18nRequired = $i18nRequired;
         $this->i18n();
@@ -563,7 +570,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @throws BadMethodCallException if i18n is disabled for this field
      * @throws InvalidArgumentException if the given pattern is invalid
      */
-    public function languageItemPattern($pattern): self
+    public function languageItemPattern(string $pattern): self
     {
         if (!$this->isI18n()) {
             throw new BadMethodCallException('The language item pattern can only be set for fields with i18n enabled.');
@@ -691,7 +698,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @throws SystemException
      */
-    public function populate()
+    public function populate(): IFormNode|self
     {
         parent::populate();
 
@@ -745,7 +752,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
                 ) {
                     if ($this->hasPlainValue()) {
                         $errorEmpty = true;
-                    //$this->addValidationError(new FormFieldValidationError('empty'));
+                        //$this->addValidationError(new FormFieldValidationError('empty'));
                     } else {
                         $errorMultilingual = true;
                         //$this->addValidationError(new FormFieldValidationError('multilingual'));
@@ -779,6 +786,9 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
         }
     }
 
+    /**
+     * @throws SystemException
+     */
     protected function validateI18n(): void
     {
         /** @noinspection PhpUndefinedFieldInspection */
@@ -829,6 +839,9 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
         }
     }
 
+    /**
+     * @throws SystemException
+     */
     protected function validatePlaintext(): void
     {
         $this->htmlInputProcessor = new HtmlInputProcessor();

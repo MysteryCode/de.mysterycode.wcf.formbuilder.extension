@@ -139,15 +139,19 @@ class MCI18nWysiwygFormContainer extends FormContainer
      * By default, no attachment data is set.
      *
      * @throws  BadMethodCallException         if the attachment form field has already been initialized
+     * @throws SystemException
      */
     public function attachmentData(?string $objectType = null, int $parentObjectID = 0): static
     {
         if (isset($this->attachmentField)) {
-            throw new BadMethodCallException("The attachment form field '{$this->getId()}' has already been initialized. Use the atatchment form field directly to manipulate attachment data.");
+            throw new BadMethodCallException(
+                "The attachment form field '{$this->getId()}' has already been initialized. 
+                Use the attachment form field directly to manipulate attachment data."
+            );
         }
 
         if ($objectType === null) {
-            $this->attachmentData = null;
+            $this->attachmentData = [];
         } else {
             if (
                 ObjectTypeCache::getInstance()->getObjectTypeByName(
@@ -155,7 +159,9 @@ class MCI18nWysiwygFormContainer extends FormContainer
                     $objectType
                 ) === null
             ) {
-                throw new InvalidArgumentException("Unknown attachment object type '{$objectType}' for container '{$this->getId()}'.");
+                throw new InvalidArgumentException(
+                    "Unknown attachment object type '{$objectType}' for container '{$this->getId()}'."
+                );
             }
 
             $this->attachmentData = [
@@ -311,6 +317,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
      * Sets the message object type used by the wysiwyg form field.
      *
      * @throws  InvalidArgumentException       if the given string is no message object type
+     * @throws SystemException
      */
     public function messageObjectType(string $messageObjectType): static
     {
@@ -336,6 +343,8 @@ class MCI18nWysiwygFormContainer extends FormContainer
 
     /**
      * @inheritDoc
+     *
+     * @throws SystemException
      */
     public function updatedObject(array $data, IStorableObject $object, $loadValues = true): FormContainer|IFormContainer
     {
@@ -352,6 +361,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
      * By default, no poll object type is set, thus the poll form field container is not available.
      *
      * @throws  InvalidArgumentException       if the given string is no poll object type
+     * @throws SystemException
      */
     public function pollObjectType(string $pollObjectType): static
     {
@@ -390,7 +400,9 @@ class MCI18nWysiwygFormContainer extends FormContainer
      * @param string $objectType name of the relevant `com.woltlab.wcf.message.quote` object type
      * @param string $actionClass action class implementing `wcf\data\IMessageQuoteAction`
      * @param string[] $selectors selectors for the quotable content (required keys: `container`, `messageBody`, and `messageContent`)
-     * @return  static
+     * @return static
+     *
+     * @throws SystemException
      */
     public function quoteData(string $objectType, string $actionClass, array $selectors = []): static
     {
@@ -422,6 +434,8 @@ class MCI18nWysiwygFormContainer extends FormContainer
 
     /**
      * Sets the attachment handler of the attachment form field.
+     *
+     * @throws SystemException
      */
     protected function setAttachmentHandler(): void
     {
@@ -457,6 +471,8 @@ class MCI18nWysiwygFormContainer extends FormContainer
      * Sets if quotes are supported by the editor field and returns this form container.
      *
      * By default, quotes are not supported.
+     *
+     * @throws SystemException
      */
     public function supportQuotes(bool $supportQuotes = true): static
     {

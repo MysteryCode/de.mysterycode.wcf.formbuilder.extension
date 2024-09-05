@@ -35,7 +35,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Dep
             return this;
         }
         /**
-         * Sets the state of the the dependency-field to be met.
+         * Sets the state of the dependency-field to be met.
          */
         state(state) {
             this._state = state;

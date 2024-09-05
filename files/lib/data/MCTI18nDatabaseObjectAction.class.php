@@ -3,6 +3,7 @@
 namespace wcf\data;
 
 use wcf\system\attachment\AttachmentHandler;
+use wcf\system\exception\SystemException;
 use wcf\system\html\input\HtmlInputProcessor;
 use wcf\system\language\I18nHandler;
 use wcf\system\message\embedded\object\MessageEmbeddedObjectManager;
@@ -15,20 +16,16 @@ use wcf\util\StringUtil;
  */
 trait MCTI18nDatabaseObjectAction
 {
-    /**
-     * @param    string         $propertyName
-     * @param    string|null    $value
-     */
     protected function enforceValue(string $propertyName, ?string $value = null): void
     {
         if (isset($this->parameters['data'][$propertyName])) {
             return;
         }
 
-        if (
-            !isset($this->parameter[$propertyName . '_htmlInputProcessors'])
-            && !isset($this->parameters[$propertyName . '_i18n'])
-        ) {
+        $_htmlInputProcessors = $propertyName . '_htmlInputProcessors';
+        $_i18n = $propertyName . '_i18n';
+
+        if (!isset($this->parameter[$_htmlInputProcessors]) && !isset($this->parameters[$_i18n])) {
             return;
         }
 
@@ -36,16 +33,13 @@ trait MCTI18nDatabaseObjectAction
             $value = StringUtil::getRandomID();
         }
 
-        $this->parameter['data'][$propertyName] = $value;
+        if (isset($this->parameter)) {
+            $this->parameter['data'][$propertyName] = $value;
+        }
     }
 
     /**
-     * @param    string            $propertyName
-     * @param    string            $languageItemPattern
-     * @param    string            $languageItemCategory
-     * @param    DatabaseObject    $object
-     * @param    int               $packageID
-     * @return array
+     * @throws SystemException
      */
     protected function saveI18nValues(
         string $propertyName,
@@ -59,7 +53,11 @@ trait MCTI18nDatabaseObjectAction
         $attachmentCount = 0;
         $languageItem = \str_replace('\\d+', $object->getObjectID(), $languageItemPattern);
 
-        if (isset($this->parameter[$propertyName . '_htmlInputProcessors'])) {
+        $_htmlInputProcessors = $propertyName . '_htmlInputProcessors';
+        $_i18n = $propertyName . '_i18n';
+        $_attachmentHandler = $propertyName . '_attachmentHandler';
+
+        if (isset($this->parameter[$_htmlInputProcessors])) {
             $values = [];
             /** @var HtmlInputProcessor $htmlInputProcessor */
             foreach ($this->parameter[$propertyName . '_htmlInputProcessors'] as $languageID => $htmlInputProcessor) {
@@ -71,20 +69,21 @@ trait MCTI18nDatabaseObjectAction
                 $values[$languageID] = $htmlInputProcessor->getHtml();
             }
 
-            if (isset($this->parameter[$propertyName . '_attachmentHandler'])) {
+            if (isset($this->parameter[$_attachmentHandler])) {
                 $attachmentHandler = $this->parameter[$propertyName . '_attachmentHandler'];
                 \assert($attachmentHandler instanceof AttachmentHandler);
                 $attachmentHandler->updateObjectID($object->getObjectID());
                 $attachmentCount = $attachmentHandler->count();
             }
-        } elseif (isset($this->parameters[$propertyName . '_i18n'])) {
-            $values = $this->parameter[$propertyName . '_i18n'];
+        } elseif (isset($this->parameter, $this->parameters[$_i18n])) {
+            $values = $this->parameter[$_i18n];
         }
 
         if (!empty($values)) {
             I18nHandler::getInstance()->save($values, $languageItem, $languageItemCategory, $packageID);
             if ($object->{$propertyName} !== $languageItem) {
                 $className = $this->getClassName();
+
                 (new $className($object))->update([
                     $propertyName => $languageItem,
                 ]);

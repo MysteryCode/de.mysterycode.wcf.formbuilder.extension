@@ -12,7 +12,7 @@ use wcf\system\exception\SystemException;
 use wcf\system\form\builder\field\MCAttachmentFormField;
 
 /**
- * Container providing the possiblity to upload attachmetns without the need of an wysiwyg-editor
+ * Container providing the possibility to upload attachments without the need of a wysiwyg-editor
  *
  * @author      Florian Gail
  * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
@@ -21,31 +21,23 @@ class MCAttachmentFormContainer extends FormContainer
 {
     /**
      * attachment form field
-     *
-     * @var MCAttachmentFormField
      */
-    protected MCAttachmentFormField $attachmentField;
+    protected ?MCAttachmentFormField $attachmentField = null;
 
     /**
      * attachment-related data used to create an `AttachmentHandler` object for the attachment form field
-     *
-     * @var null|array
      */
     protected ?array $attachmentData;
 
     /**
      * id of the edited object
-     *
-     * @var integer
      */
-    protected int $objectId;
+    protected int $objectId = 0;
 
     /**
      * id of the field itself
-     *
-     * @var integer
      */
-    protected int $fieldId;
+    protected int $fieldId = 0;
 
     /**
      * @inheritDoc
@@ -104,9 +96,7 @@ class MCAttachmentFormContainer extends FormContainer
     /**
      * Returns the form field handling attachments.
      *
-     * @return MCAttachmentFormField
-     *
-     * @throws BadMethodCallException if the form field container has not been populated yet/form has not been built yet
+     * @return MCAttachmentFormField|null
      */
     public function getAttachmentField(): ?MCAttachmentFormField
     {
@@ -132,7 +122,7 @@ class MCAttachmentFormContainer extends FormContainer
     /**
      * @inheritDoc
      */
-    public function id($id)
+    public function id($id): self
     {
         $this->fieldId = $id;
 
@@ -166,7 +156,7 @@ class MCAttachmentFormContainer extends FormContainer
      *
      * @throws SystemException
      */
-    public function populate()
+    public function populate(): void
     {
         parent::populate();
 

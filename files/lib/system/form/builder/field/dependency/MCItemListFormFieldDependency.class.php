@@ -93,7 +93,7 @@ class MCItemListFormFieldDependency extends AbstractFormFieldDependency
             );
         }
 
-        return $this->state ?? null;
+        return $this->state;
     }
 
     /**

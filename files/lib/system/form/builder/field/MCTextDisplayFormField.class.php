@@ -32,7 +32,7 @@ class MCTextDisplayFormField extends AbstractFormField
     /**
      * @inheritDoc
      */
-    public function readValue()
+    public function readValue(): IFormField|self
     {
         return $this;
     }

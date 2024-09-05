@@ -81,7 +81,7 @@ class MCPasswordFormField extends AbstractFormField implements
      *
      * @throws SystemException
      */
-    public function readValue()
+    public function readValue(): IFormField|self
     {
         if ($this->getDocument()->hasRequestData($this->getPrefixedId())) {
             $value = $this->getDocument()->getRequestData($this->getPrefixedId());
@@ -90,6 +90,7 @@ class MCPasswordFormField extends AbstractFormField implements
                 $this->value = StringUtil::trim($value);
             }
         }
+
         if ($this->getDocument()->hasRequestData($this->getPrefixedId() . '_passwordStrengthVerdict')) {
             $strength = $this->getDocument()->getRequestData($this->getPrefixedId() . '_passwordStrengthVerdict');
 
@@ -146,7 +147,7 @@ class MCPasswordFormField extends AbstractFormField implements
     /**
      * @inheritDoc
      */
-    public function populate()
+    public function populate(): void
     {
         parent::populate();
 

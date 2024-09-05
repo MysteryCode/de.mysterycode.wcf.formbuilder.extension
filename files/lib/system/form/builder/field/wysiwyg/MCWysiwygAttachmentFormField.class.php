@@ -47,7 +47,7 @@ class MCWysiwygAttachmentFormField extends AbstractFormField
      * For the initial attachment handler set by this method, the temporary hashes will be
      * automatically set by either reading them from the session variables if the form handles
      * AJAX requests or by creating a new one. If the temporary hashes are read from session,
-     * the session variable will be unregistered afterwards.
+     * the session variable will be unregistered afterward.
      *
      * @param null|AttachmentHandler $attachmentHandler
      * @return static
@@ -117,7 +117,7 @@ class MCWysiwygAttachmentFormField extends AbstractFormField
     /**
      * @inheritDoc
      */
-    public function populate()
+    public function populate(): self
     {
         parent::populate();
 
@@ -138,14 +138,15 @@ class MCWysiwygAttachmentFormField extends AbstractFormField
     /**
      * @inheritDoc
      */
-    public function readValue()
+    public function readValue(): void
     {
         if ($this->getDocument()->hasRequestData($this->getPrefixedId() . '_tmpHash')) {
             $tmpHash = $this->getDocument()->getRequestData($this->getPrefixedId() . '_tmpHash');
+
             if (\is_string($tmpHash)) {
-                $this->getAttachmentHandler()->setTmpHashes([$tmpHash]);
+                $this->getAttachmentHandler()?->setTmpHashes([$tmpHash]);
             } elseif (\is_array($tmpHash)) {
-                $this->getAttachmentHandler()->setTmpHashes($tmpHash);
+                $this->getAttachmentHandler()?->setTmpHashes($tmpHash);
             }
         }
     }

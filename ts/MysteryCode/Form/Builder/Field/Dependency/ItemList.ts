@@ -39,7 +39,7 @@ export class ItemList extends Abstract {
   }
 
   /**
-   * Sets the state of the the dependency-field to be met.
+   * Sets the state of the dependency-field to be met.
    */
   state(state: number): ItemList {
     this._state = state;

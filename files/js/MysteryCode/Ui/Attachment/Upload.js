@@ -2,19 +2,18 @@
  * @author Florian Gail
  * @module MysteryCode/Ui/Attachment/Upload
  */
-define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/Core/Dom/Util", "WoltLabSuite/Core/Core", "WoltLabSuite/Core/Language", "WoltLabSuite/Core/Event/Handler", "WoltLabSuite/Core/Image/ImageUtil", "WoltLabSuite/Core/Image/Resizer", "WoltLabSuite/Core/Dom/Change/Listener", "WoltLabSuite/Core/Dom/Change/Listener", "WoltLabSuite/Core/Upload", "WoltLabSuite/Core/Environment", "WoltLabSuite/Core/FileUtil"], function (require, exports, tslib_1, Ajax, DomUtil, Core, Language, EventHandler, ImageUtil, Resizer_1, ChangeListener, Listener_1, Upload_1, Environment, FileUtil) {
+define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/Core/Dom/Util", "WoltLabSuite/Core/Core", "WoltLabSuite/Core/Event/Handler", "WoltLabSuite/Core/Image/ImageUtil", "WoltLabSuite/Core/Image/Resizer", "WoltLabSuite/Core/Dom/Change/Listener", "WoltLabSuite/Core/Dom/Change/Listener", "WoltLabSuite/Core/Upload", "WoltLabSuite/Core/Environment", "WoltLabSuite/Core/FileUtil", "WoltLabSuite/Core/Language"], function (require, exports, tslib_1, Ajax, Util_1, Core, EventHandler, ImageUtil, Resizer_1, Listener_1, Listener_2, Upload_1, Environment, FileUtil, Language_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AttachmentUpload = void 0;
     Ajax = tslib_1.__importStar(Ajax);
-    DomUtil = tslib_1.__importStar(DomUtil);
+    Util_1 = tslib_1.__importDefault(Util_1);
     Core = tslib_1.__importStar(Core);
-    Language = tslib_1.__importStar(Language);
     EventHandler = tslib_1.__importStar(EventHandler);
     ImageUtil = tslib_1.__importStar(ImageUtil);
     Resizer_1 = tslib_1.__importDefault(Resizer_1);
-    ChangeListener = tslib_1.__importStar(ChangeListener);
     Listener_1 = tslib_1.__importDefault(Listener_1);
+    Listener_2 = tslib_1.__importDefault(Listener_2);
     Upload_1 = tslib_1.__importDefault(Upload_1);
     Environment = tslib_1.__importStar(Environment);
     FileUtil = tslib_1.__importStar(FileUtil);
@@ -26,7 +25,6 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         _insertAllButton;
         _autoInsert = [];
         _replaceOnLoad = {};
-        _resizer = null;
         constructor(buttonContainerId, targetId, objectType, objectID, tmpHash, parentObjectID, maxUploads, editorId, options) {
             super(buttonContainerId, targetId, Core.extend({
                 multiple: true,
@@ -49,13 +47,13 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             // if an editor is used
             this._insertAllButton = document.createElement("p");
             this._insertAllButton.classList.add("button", "jsButtonAttachmentInsertAll");
-            this._insertAllButton.textContent = Language.get("wcf.attachment.insertAll");
-            DomUtil.hide(this._insertAllButton);
+            this._insertAllButton.textContent = (0, Language_1.getPhrase)("wcf.attachment.insertAll");
+            Util_1.default.hide(this._insertAllButton);
             if (this._editorId) {
                 this._buttonContainer.appendChild(this._insertAllButton);
                 this._insertAllButton.addEventListener("click", () => this.insertAll());
                 if (this._target.querySelectorAll(":scope > li:not(.uploadFailed)").length) {
-                    DomUtil.show(this._insertAllButton);
+                    Util_1.default.show(this._insertAllButton);
                 }
                 EventHandler.add("com.woltlab.wcf.redactor2", "submit_" + this._editorId, (data) => this.submitInline(data));
                 EventHandler.add("com.woltlab.wcf.redactor2", "reset_" + this._editorId, () => this.reset());
@@ -156,13 +154,13 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                 this._button.classList.remove("active");
             });
             const span = document.createElement("span");
-            span.textContent = Language.get("wcf.global.button.upload");
+            span.textContent = (0, Language_1.getPhrase)("wcf.global.button.upload");
             this._button.appendChild(span);
             this._button.insertAdjacentElement("afterbegin", this._fileUpload);
             this._insertButton();
-            Listener_1.default.trigger();
+            Listener_2.default.trigger();
         }
-        resize(file, blob) {
+        async resize(file, blob) {
             const item = blob ? blob : file;
             // Ignore anything that is not a widely used mimetype for static images.
             // GIFs are not supported due to the support for animations.
@@ -186,7 +184,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             });
             return resizer
                 .loadFile(file)
-                .then((result) => {
+                .then(async (result) => {
                 const exif = result.exif;
                 let maxWidth = this._options.autoScale.maxWidth;
                 const maxHeight = this._options.autoScale.maxHeight;
@@ -256,10 +254,10 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         }
         checkMaxFiles() {
             if (this._options.maxUploads !== null && this._target.childElementCount >= this._options.maxUploads) {
-                DomUtil.hide(this._button);
+                Util_1.default.hide(this._button);
             }
             else {
-                DomUtil.show(this._button);
+                Util_1.default.show(this._button);
             }
         }
         insert(event) {
@@ -304,7 +302,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             if (attachmentsFound && !this._target.classList.contains("sortableList")) {
                 this._target.classList.add("sortableList");
                 if (Environment.platform() === "desktop") {
-                    new window.WCF.Sortable.List(DomUtil.identify(this._target.parentNode), "", 0, {
+                    new window.WCF.Sortable.List(Util_1.default.identify(this._target.parentNode), "", 0, {
                         axis: false,
                         items: "li.sortableAttachment",
                         toleranceElement: null,
@@ -363,10 +361,10 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
         reset() {
             this._target.childNodes.forEach((element) => {
                 element.remove();
-                DomUtil.hide(this._target);
+                Util_1.default.hide(this._target);
             });
             if (this._insertAllButton !== null) {
-                DomUtil.hide(this._insertAllButton);
+                Util_1.default.hide(this._insertAllButton);
             }
             this.checkMaxFiles();
         }
@@ -422,7 +420,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             }
         }
         syncNew(data) {
-            const fragment = DomUtil.createFragmentFromHtml(data.html);
+            const fragment = Util_1.default.createFragmentFromHtml(data.html);
             const attachment = fragment.querySelector(":scope > li");
             attachment.id = "";
             this.registerEditorButtons(attachment);
@@ -432,13 +430,13 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             this.makeSortable();
             if (this._insertAllButton !== null) {
                 if (this._target.querySelector(":scope > li:not(.uploadFailed)") !== null) {
-                    DomUtil.show(this._insertAllButton);
+                    Util_1.default.show(this._insertAllButton);
                 }
                 else {
-                    DomUtil.hide(this._insertAllButton);
+                    Util_1.default.hide(this._insertAllButton);
                 }
             }
-            ChangeListener.trigger();
+            Listener_1.default.trigger();
         }
         registerEditorButtons(attachment) {
             if (this._editorId) {
@@ -461,7 +459,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                 innerError.className = "innerError";
                 this._buttonContainer.insertAdjacentElement("afterend", innerError);
             }
-            innerError.textContent = Language.get("wcf.upload.error.reachedRemainingLimit", {
+            innerError.textContent = (0, Language_1.getPhrase)("wcf.upload.error.reachedRemainingLimit", {
                 maxFiles: this._options.maxUploads - this._target.childElementCount,
             });
             return false;
@@ -475,7 +473,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
             return super._upload(event, file, blob);
         }
         _createFileElement(file) {
-            DomUtil.show(this._target);
+            Util_1.default.show(this._target);
             const element = super._createFileElement(file);
             element.classList.add("box64", "jsObjectActionObject");
             const progress = element.querySelector("progress");
@@ -510,7 +508,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                 icon.classList.add("fa-ban");
                 const innerError = document.createElement("span");
                 innerError.className = "innerError";
-                innerError.textContent = Language.get("wcf.upload.error.uploadFailed");
+                innerError.textContent = (0, Language_1.getPhrase)("wcf.upload.error.uploadFailed");
                 small.insertAdjacentElement("afterend", innerError);
             });
             throw new Error(`Upload failed: ${data.message}`);
@@ -550,9 +548,9 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                     const deleteButton = document.createElement("span");
                     deleteButton.classList.add("button", "small", "jsObjectAction");
                     deleteButton.dataset.objectAction = "delete";
-                    deleteButton.dataset.confirmMessage = Language.get("wcf.attachment.delete.sure");
+                    deleteButton.dataset.confirmMessage = (0, Language_1.getPhrase)("wcf.attachment.delete.sure");
                     deleteButton.dataset.eventName = "attachment";
-                    deleteButton.textContent = Language.get("wcf.global.button.delete");
+                    deleteButton.textContent = (0, Language_1.getPhrase)("wcf.global.button.delete");
                     li.appendChild(deleteButton);
                     buttonGroup.appendChild(li);
                     if (this._editorId) {
@@ -563,7 +561,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                                 insertThumbnailButton.classList.add("button", "small", "jsButtonAttachmentInsertThumbnail");
                                 insertThumbnailButton.dataset.objectId = fileData.attachmentID.toString();
                                 insertThumbnailButton.dataset.url = fileData.thumbnailURL;
-                                insertThumbnailButton.textContent = Language.get("wcf.attachment.insertThumbnail");
+                                insertThumbnailButton.textContent = (0, Language_1.getPhrase)("wcf.attachment.insertThumbnail");
                                 li.appendChild(insertThumbnailButton);
                                 buttonGroup.appendChild(li);
                             }
@@ -572,7 +570,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                             insertImageButton.classList.add("button", "small", "jsButtonAttachmentInsertFull");
                             insertImageButton.dataset.objectId = fileData.attachmentID.toString();
                             insertImageButton.dataset.url = fileData.url;
-                            insertImageButton.textContent = Language.get("wcf.attachment.insertFull");
+                            insertImageButton.textContent = (0, Language_1.getPhrase)("wcf.attachment.insertFull");
                             li.appendChild(insertImageButton);
                             buttonGroup.appendChild(li);
                         }
@@ -581,7 +579,7 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Ajax", "WoltLabSuite/C
                             const insertButton = document.createElement("span");
                             insertButton.classList.add("button", "small", "jsButtonAttachmentInsertPlain");
                             insertButton.dataset.objectId = fileData.attachmentID.toString();
-                            insertButton.textContent = Language.get("wcf.attachment.insert");
+                            insertButton.textContent = (0, Language_1.getPhrase)("wcf.attachment.insert");
                             li.appendChild(insertButton);
                             buttonGroup.appendChild(li);
                         }

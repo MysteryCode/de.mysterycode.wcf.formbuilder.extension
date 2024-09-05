@@ -4,13 +4,12 @@
  */
 
 import * as Ajax from "WoltLabSuite/Core/Ajax";
-import * as DomUtil from "WoltLabSuite/Core/Dom/Util";
+import DomUtil from "WoltLabSuite/Core/Dom/Util";
 import * as Core from "WoltLabSuite/Core/Core";
-import * as Language from "WoltLabSuite/Core/Language";
 import * as EventHandler from "WoltLabSuite/Core/Event/Handler";
 import * as ImageUtil from "WoltLabSuite/Core/Image/ImageUtil";
 import ImageResizer from "WoltLabSuite/Core/Image/Resizer";
-import * as ChangeListener from "WoltLabSuite/Core/Dom/Change/Listener";
+import ChangeListener from "WoltLabSuite/Core/Dom/Change/Listener";
 import DomChangeListener from "WoltLabSuite/Core/Dom/Change/Listener";
 import Upload from "WoltLabSuite/Core/Upload";
 import * as Environment from "WoltLabSuite/Core/Environment";
@@ -31,6 +30,7 @@ import {
 import { FileCollection, FileLikeObject, UploadId } from "WoltLabSuite/Core/Upload/Data";
 import { FileUploadHandler } from "WoltLabSuite/Core/Ui/File/Data";
 import { ResponseData } from "WoltLabSuite/Core/Ajax/Data";
+import { getPhrase } from "WoltLabSuite/Core/Language";
 
 export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements FileUploadHandler {
   protected _editorId: string;
@@ -40,7 +40,6 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
   protected _insertAllButton: HTMLElement | null;
   protected _autoInsert: UploadId[] = [];
   protected _replaceOnLoad: IReplaceOnLoad = {};
-  protected _resizer: ImageResizer | null = null;
 
   constructor(
     buttonContainerId: string,
@@ -87,7 +86,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
     // if an editor is used
     this._insertAllButton = document.createElement("p");
     this._insertAllButton.classList.add("button", "jsButtonAttachmentInsertAll");
-    this._insertAllButton.textContent = Language.get("wcf.attachment.insertAll");
+    this._insertAllButton.textContent = getPhrase("wcf.attachment.insertAll");
     DomUtil.hide(this._insertAllButton);
 
     if (this._editorId) {
@@ -111,7 +110,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
         }
 
         // Remove any existing entries for this tmpHash.
-        data.tmpHashes = data.tmpHashes.filter((item) => item !== tmpHash);
+        data.tmpHashes = data.tmpHashes.filter((item: string) => item !== tmpHash);
 
         const count = this._target.querySelectorAll(":scope > li:not(.uploadFailed)").length;
         if (count > 0) {
@@ -222,7 +221,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
     });
 
     const span = document.createElement("span");
-    span.textContent = Language.get("wcf.global.button.upload");
+    span.textContent = getPhrase("wcf.global.button.upload");
     this._button.appendChild(span);
 
     this._button.insertAdjacentElement("afterbegin", this._fileUpload);
@@ -232,9 +231,9 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
     DomChangeListener.trigger();
   }
 
-  protected resize(file: File): Promise<UploadId>;
-  protected resize(file: null, blob: Blob): Promise<UploadId>;
-  protected resize(file: File | null, blob?: Blob | null): Promise<UploadId> {
+  protected async resize(file: File): Promise<UploadId>;
+  protected async resize(file: null, blob: Blob): Promise<UploadId>;
+  protected async resize(file: File | null, blob?: Blob | null): Promise<UploadId> {
     const item: File | Blob = blob ? blob : file!;
 
     // Ignore anything that is not a widely used mimetype for static images.
@@ -263,7 +262,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
 
     return resizer
       .loadFile(file!)
-      .then((result) => {
+      .then(async (result) => {
         const exif = result.exif;
         let maxWidth = this._options.autoScale!.maxWidth;
         const maxHeight = this._options.autoScale!.maxHeight;
@@ -603,7 +602,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
       this._buttonContainer.insertAdjacentElement("afterend", innerError);
     }
 
-    innerError.textContent = Language.get("wcf.upload.error.reachedRemainingLimit", {
+    innerError.textContent = getPhrase("wcf.upload.error.reachedRemainingLimit", {
       maxFiles: this._options.maxUploads - this._target.childElementCount,
     });
 
@@ -674,7 +673,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
 
       const innerError = document.createElement("span");
       innerError.className = "innerError";
-      innerError.textContent = Language.get("wcf.upload.error.uploadFailed");
+      innerError.textContent = getPhrase("wcf.upload.error.uploadFailed");
       small.insertAdjacentElement("afterend", innerError);
     });
 
@@ -723,9 +722,9 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
         const deleteButton: HTMLSpanElement = document.createElement("span");
         deleteButton.classList.add("button", "small", "jsObjectAction");
         deleteButton.dataset.objectAction = "delete";
-        deleteButton.dataset.confirmMessage = Language.get("wcf.attachment.delete.sure");
+        deleteButton.dataset.confirmMessage = getPhrase("wcf.attachment.delete.sure");
         deleteButton.dataset.eventName = "attachment";
-        deleteButton.textContent = Language.get("wcf.global.button.delete");
+        deleteButton.textContent = getPhrase("wcf.global.button.delete");
         li.appendChild(deleteButton);
         buttonGroup.appendChild(li);
 
@@ -737,7 +736,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
               insertThumbnailButton.classList.add("button", "small", "jsButtonAttachmentInsertThumbnail");
               insertThumbnailButton.dataset.objectId = fileData.attachmentID.toString();
               insertThumbnailButton.dataset.url = fileData.thumbnailURL;
-              insertThumbnailButton.textContent = Language.get("wcf.attachment.insertThumbnail");
+              insertThumbnailButton.textContent = getPhrase("wcf.attachment.insertThumbnail");
               li.appendChild(insertThumbnailButton);
               buttonGroup.appendChild(li);
             }
@@ -747,7 +746,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
             insertImageButton.classList.add("button", "small", "jsButtonAttachmentInsertFull");
             insertImageButton.dataset.objectId = fileData.attachmentID.toString();
             insertImageButton.dataset.url = fileData.url;
-            insertImageButton.textContent = Language.get("wcf.attachment.insertFull");
+            insertImageButton.textContent = getPhrase("wcf.attachment.insertFull");
             li.appendChild(insertImageButton);
             buttonGroup.appendChild(li);
           } else {
@@ -755,7 +754,7 @@ export class AttachmentUpload extends Upload<AttachmentUploadOptions> implements
             const insertButton = document.createElement("span");
             insertButton.classList.add("button", "small", "jsButtonAttachmentInsertPlain");
             insertButton.dataset.objectId = fileData.attachmentID.toString();
-            insertButton.textContent = Language.get("wcf.attachment.insert");
+            insertButton.textContent = getPhrase("wcf.attachment.insert");
             li.appendChild(insertButton);
             buttonGroup.appendChild(li);
           }

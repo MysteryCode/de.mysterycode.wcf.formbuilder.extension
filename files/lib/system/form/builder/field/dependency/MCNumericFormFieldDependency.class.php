@@ -25,7 +25,7 @@ class MCNumericFormFieldDependency extends AbstractFormFieldDependency
     /**
      * @var int|float
      */
-    protected $referenceValue;
+    protected int|float $referenceValue;
 
     /**
      * @var string
@@ -53,10 +53,10 @@ class MCNumericFormFieldDependency extends AbstractFormFieldDependency
     }
 
     /**
-     * @param integer|float $value
+     * @param float|integer $value
      * @return MCNumericFormFieldDependency
      */
-    public function referenceValue($value): self
+    public function referenceValue(float|int $value): self
     {
         $this->referenceValue = $value;
 
@@ -66,7 +66,7 @@ class MCNumericFormFieldDependency extends AbstractFormFieldDependency
     /**
      * @return int|float
      */
-    public function getReferenceValue()
+    public function getReferenceValue(): float|int
     {
         return $this->referenceValue;
     }
@@ -90,28 +90,14 @@ class MCNumericFormFieldDependency extends AbstractFormFieldDependency
             return false;
         }
 
-        switch ($this->getOperator()) {
-            case '>':
-                return $value > $this->getReferenceValue();
-
-            case '>=':
-                return $value >= $this->getReferenceValue();
-
-            case '<':
-                return $value < $this->getReferenceValue();
-
-            case '<=':
-                return $value <= $this->getReferenceValue();
-
-            case '==':
-                /** @noinspection TypeUnsafeComparisonInspection */
-                return $value == $this->getReferenceValue();
-
-            case '===':
-                return $value === $this->getReferenceValue();
-
-            default:
-                return false;
-        }
+        return match ($this->getOperator()) {
+            '>' => $value > $this->getReferenceValue(),
+            '>=' => $value >= $this->getReferenceValue(),
+            '<' => $value < $this->getReferenceValue(),
+            '<=' => $value <= $this->getReferenceValue(),
+            '==' => $value == $this->getReferenceValue(),
+            '===' => $value === $this->getReferenceValue(),
+            default => false,
+        };
     }
 }

@@ -25,7 +25,7 @@ class MCEmptySingleSelectionFormField extends SingleSelectionFormField
     /**
      * @var mixed
      */
-    protected $emptyOptionValue = 0;
+    protected mixed $emptyOptionValue = 0;
 
     /**
      * @param bool $allowEmptySelection
@@ -46,7 +46,7 @@ class MCEmptySingleSelectionFormField extends SingleSelectionFormField
      * @param mixed $value
      * @return static
      */
-    public function emptyOptionValue($value): self
+    public function emptyOptionValue(mixed $value): self
     {
         $this->emptyOptionValue = $value;
 
@@ -72,7 +72,7 @@ class MCEmptySingleSelectionFormField extends SingleSelectionFormField
     /**
      * @return mixed
      */
-    public function getEmptyOptionValue()
+    public function getEmptyOptionValue(): mixed
     {
         return $this->emptyOptionValue;
     }
