@@ -54,7 +54,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
 
     protected string $autosaveId = '';
 
-    protected HtmlInputProcessor $htmlInputProcessor;
+    protected ?HtmlInputProcessor $htmlInputProcessor = null;
 
     /**
      * last time the field has been edited; if `0`, the last edit time is unknown
@@ -64,7 +64,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
     /**
      * quote-related data used to create the JavaScript quote manager
      */
-    protected ?array $quoteData;
+    protected ?array $quoteData = null;
 
     protected bool $supportAttachments = false;
 
@@ -97,7 +97,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
     /**
      * pattern for the language item used to save the i18n values
      */
-    protected ?string $languageItemPattern;
+    protected ?string $languageItemPattern = null;
 
     /**
      * Sets the identifier used to autosave the field value and returns this field.
