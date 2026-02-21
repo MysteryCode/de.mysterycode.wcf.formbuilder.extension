@@ -13,7 +13,11 @@ use wcf\util\StringUtil;
  * Trait providing simple usage functions for handling i18n values in DatabaseObjectActions
  *
  * @notice meant to be used in extensions of `AbstractDatabaseObjectAction` only
+ *
+ * @mixin AbstractDatabaseObjectAction<DatabaseObject, DatabaseObjectEditor<DatabaseObject>>
+ * @phpstan-require-extends AbstractDatabaseObjectAction
  */
+/** @phpstan-ignore trait.unused */
 trait MCTI18nDatabaseObjectAction
 {
     protected function enforceValue(string $propertyName, ?string $value = null): void
@@ -25,7 +29,7 @@ trait MCTI18nDatabaseObjectAction
         $_htmlInputProcessors = $propertyName . '_htmlInputProcessors';
         $_i18n = $propertyName . '_i18n';
 
-        if (!isset($this->parameter[$_htmlInputProcessors]) && !isset($this->parameters[$_i18n])) {
+        if (!isset($this->parameters[$_htmlInputProcessors]) && !isset($this->parameters[$_i18n])) {
             return;
         }
 
@@ -33,8 +37,8 @@ trait MCTI18nDatabaseObjectAction
             $value = StringUtil::getRandomID();
         }
 
-        if (isset($this->parameter)) {
-            $this->parameter['data'][$propertyName] = $value;
+        if (isset($this->parameters)) {
+            $this->parameters['data'][$propertyName] = $value;
         }
     }
 
@@ -57,10 +61,10 @@ trait MCTI18nDatabaseObjectAction
         $_i18n = $propertyName . '_i18n';
         $_attachmentHandler = $propertyName . '_attachmentHandler';
 
-        if (isset($this->parameter[$_htmlInputProcessors])) {
+        if (isset($this->parameters[$_htmlInputProcessors])) {
             $values = [];
             /** @var HtmlInputProcessor $htmlInputProcessor */
-            foreach ($this->parameter[$propertyName . '_htmlInputProcessors'] as $languageID => $htmlInputProcessor) {
+            foreach ($this->parameters[$propertyName . '_htmlInputProcessors'] as $languageID => $htmlInputProcessor) {
                 $htmlInputProcessor->setObjectID($object->getObjectID());
                 $hasEmbeddedObjects = MessageEmbeddedObjectManager::getInstance()->registerObjects(
                     $htmlInputProcessor,
@@ -69,21 +73,34 @@ trait MCTI18nDatabaseObjectAction
                 $values[$languageID] = $htmlInputProcessor->getHtml();
             }
 
-            if (isset($this->parameter[$_attachmentHandler])) {
-                $attachmentHandler = $this->parameter[$propertyName . '_attachmentHandler'];
+            if (isset($this->parameters[$_attachmentHandler])) {
+                $attachmentHandler = $this->parameters[$propertyName . '_attachmentHandler'];
                 \assert($attachmentHandler instanceof AttachmentHandler);
                 $attachmentHandler->updateObjectID($object->getObjectID());
                 $attachmentCount = $attachmentHandler->count();
             }
-        } elseif (isset($this->parameter, $this->parameters[$_i18n])) {
-            $values = $this->parameter[$_i18n];
+        } elseif (isset($this->parameters[$_i18n])) {
+            $values = $this->parameters[$_i18n];
         }
 
         if (!empty($values)) {
             I18nHandler::getInstance()->save($values, $languageItem, $languageItemCategory, $packageID);
-            if ($object->{$propertyName} !== $languageItem) {
-                $className = $this->getClassName();
 
+            if ($object->{$propertyName} !== $languageItem) {
+                $className = static::class;
+
+                if (\mb_substr($className, -6) === 'Action') {
+                    $className = \mb_substr($className, 0, -6) . 'Editor';
+                }
+                if (\method_exists($this, 'getClassName')) {
+                    $resolvedClassName = $this->getClassName();
+
+                    if (\is_string($resolvedClassName) && $resolvedClassName !== '') {
+                        $className = $resolvedClassName;
+                    }
+                }
+
+                /** @noinspection PhpMethodParametersCountMismatchInspection */
                 (new $className($object))->update([
                     $propertyName => $languageItem,
                 ]);

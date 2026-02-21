@@ -1,6 +1,6 @@
-<div id="{@$field->getPrefixedId()}">
+<div id="{$field->getPrefixedId()}">
 	{if $field->supportsHTML()}
-		{@$field->getText()}
+		{unsafe:$field->getText()}
 	{else}
 		{$field->getText()}
 	{/if}

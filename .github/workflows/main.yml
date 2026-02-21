@@ -1,0 +1,527 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      check_ts: ${{ steps.check_matrix.outputs.check_ts }}
+      check_scss: ${{ steps.check_matrix.outputs.check_scss }}
+      check_php: ${{ steps.check_matrix.outputs.check_php }}
+      check_js: ${{ steps.check_matrix.outputs.check_js }}
+      check_js_sync: ${{ steps.check_matrix.outputs.check_js_sync }}
+      language_check: ${{ steps.validate_translations.outputs.language_check }}
+      packagexml_check: ${{ steps.validate_translations.outputs.packagexml_check }}
+      is_release: ${{ steps.set_release.outputs.is_release }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Get Commit Message
+        id: get_commit_message
+        run: |
+          msg="$(git log -1 --pretty=%B)"
+          {
+            echo 'commit_message<<EOF'
+            echo "$msg"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Identify Changed Files
+        id: changed_files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.ts
+            **/*.scss
+            **/*.php
+            **/*.js
+            package.json
+            package-lock.json
+            tsconfig*.json
+            eslint.config.mjs
+            .prettierrc
+            .phpcs.xml
+            .php-cs-fixer.dist.php
+            package.xml
+            language/**
+
+      - name: Set Release Flag
+        id: set_release
+        run: |
+          cm="${{ steps.get_commit_message.outputs.commit_message }}"
+          if [[ "$cm" =~ ^\[Release\][[:space:]]+[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Detect Repository Files
+        id: repo_files
+        run: |
+          has_package_json=false
+          if git ls-files --error-unmatch package.json >/dev/null 2>&1; then
+            has_package_json=true
+          fi
+
+          has_tsconfig=false
+          if git ls-files -- 'tsconfig*.json' | grep -q .; then
+            has_tsconfig=true
+          fi
+
+          has_ts_files=false
+          if git ls-files -- '*.ts' | grep -q .; then
+            has_ts_files=true
+          fi
+
+          has_scss_files=false
+          if git ls-files -- '*.scss' | grep -E '^files/style/' | grep -q .; then
+            has_scss_files=true
+          fi
+
+          has_js_files=false
+          if git ls-files -- '*.js' | grep -E '^files[^/]+/' | grep -v '/3rdParty/' | grep -q .; then
+            has_js_files=true
+          fi
+
+          has_php_files=false
+          if git ls-files -- '*.php' | grep -v '^generateConstants.php$' | grep -q .; then
+            has_php_files=true
+          fi
+
+          has_language_dir=false
+          if git ls-files -- 'language/*' | grep -q .; then
+            has_language_dir=true
+          fi
+
+          has_package_xml=false
+          if git ls-files --error-unmatch package.xml >/dev/null 2>&1; then
+            has_package_xml=true
+          fi
+
+          echo "has_package_json=$has_package_json" >> "$GITHUB_OUTPUT"
+          echo "has_tsconfig=$has_tsconfig" >> "$GITHUB_OUTPUT"
+          echo "has_ts_files=$has_ts_files" >> "$GITHUB_OUTPUT"
+          echo "has_scss_files=$has_scss_files" >> "$GITHUB_OUTPUT"
+          echo "has_js_files=$has_js_files" >> "$GITHUB_OUTPUT"
+          echo "has_php_files=$has_php_files" >> "$GITHUB_OUTPUT"
+          echo "has_language_dir=$has_language_dir" >> "$GITHUB_OUTPUT"
+          echo "has_package_xml=$has_package_xml" >> "$GITHUB_OUTPUT"
+
+      - name: Determine Job Checks
+        id: check_matrix
+        run: |
+          is_release="${{ steps.set_release.outputs.is_release }}"
+          changed_files="$(echo "${{ steps.changed_files.outputs.all_changed_files }}" | tr ' ' '\n')"
+
+          ts_changed=false
+          if echo "$changed_files" | grep -Eq '\.ts$|tsconfig[^/]*\.json|^package\.json$|^package-lock\.json$|^eslint\.config\.mjs$'; then
+            ts_changed=true
+          fi
+
+          scss_changed=false
+          if echo "$changed_files" | grep -Eq '^files/style/.*\.scss$|^package\.json$|^package-lock\.json$|^\.prettierrc$'; then
+            scss_changed=true
+          fi
+
+          js_changed=false
+          if echo "$changed_files" | grep -Eq '^files[^/]+/.*\.js$|^package\.json$|^package-lock\.json$'; then
+            js_changed=true
+          fi
+
+          php_changed=false
+          if echo "$changed_files" | grep -Eq '\.php$|^\.phpcs\.xml$|^\.php-cs-fixer\.dist\.php$'; then
+            php_changed=true
+          fi
+
+          js_sync_changed=false
+          if echo "$changed_files" | grep -Eq '\.ts$|\.js$|tsconfig[^/]*\.json|^package\.json$|^package-lock\.json$'; then
+            js_sync_changed=true
+          fi
+
+          has_package_json="${{ steps.repo_files.outputs.has_package_json }}"
+          has_tsconfig="${{ steps.repo_files.outputs.has_tsconfig }}"
+          has_ts_files="${{ steps.repo_files.outputs.has_ts_files }}"
+          has_scss_files="${{ steps.repo_files.outputs.has_scss_files }}"
+          has_js_files="${{ steps.repo_files.outputs.has_js_files }}"
+          has_php_files="${{ steps.repo_files.outputs.has_php_files }}"
+
+          check_ts=false
+          if [[ "$has_package_json" == "true" && "$has_tsconfig" == "true" && "$has_ts_files" == "true" ]]; then
+            if [[ "$is_release" == "true" || "$ts_changed" == "true" ]]; then
+              check_ts=true
+            fi
+          fi
+
+          check_scss=false
+          if [[ "$has_package_json" == "true" && "$has_scss_files" == "true" ]]; then
+            if [[ "$is_release" == "true" || "$scss_changed" == "true" ]]; then
+              check_scss=true
+            fi
+          fi
+
+          check_js=false
+          if [[ "$has_package_json" == "true" && "$has_js_files" == "true" ]]; then
+            if [[ "$is_release" == "true" || "$js_changed" == "true" ]]; then
+              check_js=true
+            fi
+          fi
+
+          check_php=false
+          if [[ "$has_php_files" == "true" ]]; then
+            if [[ "$is_release" == "true" || "$php_changed" == "true" ]]; then
+              check_php=true
+            fi
+          fi
+
+          check_js_sync=false
+          if [[ "$has_package_json" == "true" && "$has_tsconfig" == "true" && "$has_ts_files" == "true" ]]; then
+            if [[ "$is_release" == "true" || "$js_sync_changed" == "true" ]]; then
+              check_js_sync=true
+            fi
+          fi
+
+          echo "check_ts=$check_ts" >> "$GITHUB_OUTPUT"
+          echo "check_scss=$check_scss" >> "$GITHUB_OUTPUT"
+          echo "check_js=$check_js" >> "$GITHUB_OUTPUT"
+          echo "check_php=$check_php" >> "$GITHUB_OUTPUT"
+          echo "check_js_sync=$check_js_sync" >> "$GITHUB_OUTPUT"
+
+      - name: Validate Translations
+        id: validate_translations
+        run: |
+          set -euo pipefail
+
+          is_release="${{ steps.set_release.outputs.is_release }}"
+          changed_files="$(echo "${{ steps.changed_files.outputs.all_changed_files }}" | tr ' ' '\n')"
+
+          language_check=true
+          packagexml_check=true
+          errors=0
+
+          language_changed=false
+          if echo "$changed_files" | grep -Eq '^language/'; then
+            language_changed=true
+          fi
+
+          packagexml_changed=false
+          if echo "$changed_files" | grep -Eq '^package\.xml$'; then
+            packagexml_changed=true
+          fi
+
+          if [[ "${{ steps.repo_files.outputs.has_language_dir }}" == "true" && ( "$is_release" == "true" || "$language_changed" == "true" ) ]]; then
+            required_files=("cs.xml" "da.xml" "de.xml" "en.xml" "es.xml" "fr.xml" "hu.xml" "it.xml" "nl.xml" "no.xml" "pl.xml" "ro.xml" "ru.xml" "sv.xml" "tr.xml")
+            missing_files=()
+
+            for file in "${required_files[@]}"; do
+              if [ ! -f "./language/$file" ]; then
+                missing_files+=("$file")
+              fi
+            done
+
+            if [ ${#missing_files[@]} -ne 0 ]; then
+              echo "Missing language files: ${missing_files[*]}"
+              language_check=false
+              errors=1
+            else
+              echo "All required language files are present."
+            fi
+          else
+            echo "Language checks skipped."
+          fi
+
+          if [[ "${{ steps.repo_files.outputs.has_package_xml }}" == "true" && ( "$is_release" == "true" || "$packagexml_changed" == "true" ) ]]; then
+            if ! command -v xmllint &> /dev/null; then
+              echo "xmllint could not be found. Installing libxml2-utils..."
+              sudo apt-get update
+              sudo apt-get install -y libxml2-utils
+            fi
+
+            languages=("cs" "da" "de" "es" "fr" "hu" "it" "nl" "no" "pl" "ro" "ru" "sv" "tr")
+            missing_translations=()
+
+            for lang in "${languages[@]}"; do
+              packagename_exists=$(xmllint --xpath "boolean(//*[local-name()='packagename'][@language='$lang'])" package.xml 2>/dev/null)
+
+              if [ "$packagename_exists" != "true" ]; then
+                missing_translations+=("packagename[$lang]")
+                echo "Missing packagename for language: $lang"
+              fi
+
+              packagedescription_exists=$(xmllint --xpath "boolean(//*[local-name()='packagedescription'][@language='$lang'])" package.xml 2>/dev/null)
+
+              if [ "$packagedescription_exists" != "true" ]; then
+                missing_translations+=("packagedescription[$lang]")
+                echo "Missing packagedescription for language: $lang"
+              fi
+            done
+
+            if [ ${#missing_translations[@]} -ne 0 ]; then
+              packagexml_check=false
+              errors=1
+            else
+              echo "All required package.xml translations are present."
+            fi
+          else
+            echo "package.xml checks skipped."
+          fi
+
+          echo "language_check=$language_check" >> "$GITHUB_OUTPUT"
+          echo "packagexml_check=$packagexml_check" >> "$GITHUB_OUTPUT"
+
+          if [ "$errors" -ne 0 ]; then
+            exit 1
+          fi
+
+  php:
+    name: PHP Code Style, Fixes, and Syntax Check
+    needs: init
+    if: needs.init.outputs.check_php == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - php-version: '8.1'
+            full_check: true
+          - php-version: '8.4'
+            full_check: false
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: ctype, dom, exif, gd, gmp, hash, intl, json, libxml, mbstring, opcache, pcre, pdo, pdo_mysql, zlib, xml, phar
+          tools: cs2pr, phpcs, php-cs-fixer
+
+      - name: PHP Code Style Check (phpcs)
+        if: matrix.full_check
+        run: |
+          phpcs -n -q --report=checkstyle | cs2pr
+
+      - name: PHP Code Fix Check (php-cs-fixer)
+        if: matrix.full_check
+        run: |
+          PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix --dry-run --diff
+
+      - name: Add PHP Syntax Matcher
+        run: |
+          echo "::add-matcher::.github/php-syntax.json"
+
+      - name: PHP Syntax Check
+        run: |
+          ! find . -type f -path "./files*/*.php" -print0 \
+            | xargs -0 -n1 -P "$(nproc)" php -l 2>&1 \
+            | grep -v '^No syntax errors detected'
+
+  typescript:
+    name: TypeScript Linting and Syntax Check
+    needs: init
+    if: needs.init.outputs.check_ts == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: TypeScript Syntax Check
+        run: |
+          npx tsc --noEmit
+
+      - name: ESLint
+        run: |
+          npx eslint .
+
+      - name: Prettier Format Check
+        run: |
+          npx prettier --check "**/*.ts"
+
+  javascript:
+    name: JavaScript Linting and Syntax Check
+    needs: init
+    if: needs.init.outputs.check_js == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Add JavaScript Syntax Matcher
+        run: |
+          echo "::add-matcher::.github/javascript-syntax.json"
+
+      - name: Check JavaScript Syntax
+        run: |
+          files_dirs=$(find . -type d -name 'files*')
+          if [ -n "$files_dirs" ]; then
+            for dir in $files_dirs; do
+              echo "Checking JavaScript files in directory: $dir"
+              ! find "$dir" -type f -name '*.js' -exec node -c '{}' \; 2>&1 | \
+                awk 'BEGIN {m=0} /(.js):[0-9]+$/ {m=1; printf "%s - ",$0} m==1 && /^SyntaxError/ { m=0; print }' | \
+                sed "s@$(pwd)@.@" | grep '^'
+            done
+          fi
+
+  scss:
+    name: SCSS Prettier
+    needs: init
+    if: needs.init.outputs.check_scss == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Run Prettier on SCSS
+        run: |
+          npx prettier --check "files/style/**/*.scss"
+
+  javascript_sync:
+    name: Check for Outdated JavaScript
+    needs: init
+    if: needs.init.outputs.check_js_sync == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Remove Specific Directories
+        run: |
+          rm -rf files/js/SoftCreatR/
+          rm -rf files/js/MysteryCode/
+
+      - name: Run TSC
+        run: |
+          npx tsc
+
+      - name: Add JavaScript Sync Matcher
+        run: |
+          echo "::add-matcher::.github/diff.json"
+
+      - name: Show JavaScript Sync Diff
+        run: |
+          git diff --exit-code -- '*.js'
+
+  create-release:
+    needs: [init, php, typescript, javascript, scss, javascript_sync]
+    if: >
+      always() && !cancelled() &&
+      (startsWith(github.event.head_commit.message, '[Release]') || startsWith(github.ref, 'refs/tags/')) &&
+      (
+        contains(github.event.head_commit.message, '[Force]') || (
+          !contains(needs.init.result, 'failure') &&
+          !contains(needs.php.result, 'failure') &&
+          !contains(needs.typescript.result, 'failure') &&
+          !contains(needs.javascript.result, 'failure') &&
+          !contains(needs.scss.result, 'failure') &&
+          !contains(needs.javascript_sync.result, 'failure') &&
+          needs.init.outputs.language_check == 'true' &&
+          needs.init.outputs.packagexml_check == 'true'
+        )
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: List Existing Tags
+        run: git tag -l
+
+      - name: Clean Git Repository
+        run: |
+          git fetch --prune --tags
+          git tag -d $(git tag) || true
+          git fetch --tags
+
+      - name: Get current version
+        id: current-version
+        run: |
+          version=$(grep '<version>' package.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
+          echo "version=$version" >> $GITHUB_ENV
+
+      - name: Create Tag
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git rev-parse "${{ env.version }}" >/dev/null 2>&1; then
+            echo "Tag ${{ env.version }} already exists. Skipping tag creation."
+          else
+            git tag -a "${{ env.version }}" -m "Release v${{ env.version }}"
+          fi
+
+      - name: Push Tag
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          git push https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}.git "${{ env.version }}"
+
+      - name: Verify Tag Push
+        run: |
+          git fetch --tags
+          git tag -l
+
+      - name: Trigger Build Workflow
+        if: ${{ !cancelled() }}
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          event-type: Build
+          client-payload: '{"tag": "${{ env.version }}", "source_run_id": "${{ github.run_id }}"}'
+
+      - name: Clean Workspace
+        if: always()
+        run: git clean -fdx && git reset --hard

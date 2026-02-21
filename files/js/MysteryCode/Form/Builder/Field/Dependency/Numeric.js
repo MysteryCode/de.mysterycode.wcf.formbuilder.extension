@@ -9,6 +9,14 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Dep
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Numeric = void 0;
     Abstract_1 = tslib_1.__importDefault(Abstract_1);
+    const comparison = {
+        ">": (a, b) => a > b,
+        ">=": (a, b) => a >= b,
+        "<": (a, b) => a < b,
+        "<=": (a, b) => a <= b,
+        "==": (a, b) => a === b,
+        "===": (a, b) => a === b,
+    };
     class Numeric extends Abstract_1.default {
         _referenceValue = null;
         _operator = null;
@@ -27,34 +35,14 @@ define(["require", "exports", "tslib", "WoltLabSuite/Core/Form/Builder/Field/Dep
             if (this._operator === null) {
                 throw new Error("Operator has not been set.");
             }
-            const comparison = {
-                ">": (a, b) => {
-                    return a > b;
-                },
-                ">=": (a, b) => {
-                    return a >= b;
-                },
-                "<": (a, b) => {
-                    return a < b;
-                },
-                "<=": (a, b) => {
-                    return a <= b;
-                },
-                "==": (a, b) => {
-                    return a == b;
-                },
-                "===": (a, b) => {
-                    return a === b;
-                },
-            };
-            if (this._field) {
-                const field = this._field;
-                if (field.value === "") {
-                    return false;
-                }
-                return comparison[this._operator](field.value, this._referenceValue);
+            if (!(this._field instanceof HTMLInputElement) || this._field.value === "") {
+                return false;
             }
-            return false;
+            const value = Number.parseFloat(this._field.value);
+            if (Number.isNaN(value)) {
+                return false;
+            }
+            return comparison[this._operator](value, this._referenceValue);
         }
     }
     exports.Numeric = Numeric;

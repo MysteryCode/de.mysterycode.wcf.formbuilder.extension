@@ -4,7 +4,6 @@ namespace wcf\system\form\builder\field\wysiwyg;
 
 use BadMethodCallException;
 use InvalidArgumentException;
-use wcf\data\IMessageQuoteAction;
 use wcf\data\IStorableObject;
 use wcf\data\language\item\LanguageItemList;
 use wcf\data\object\type\ObjectTypeCache;
@@ -24,6 +23,7 @@ use wcf\system\form\builder\IFormNode;
 use wcf\system\form\builder\IObjectTypeFormNode;
 use wcf\system\form\builder\TObjectTypeFormNode;
 use wcf\system\html\input\HtmlInputProcessor;
+use wcf\system\html\upcast\HtmlUpcastProcessor;
 use wcf\system\language\I18nHandler;
 use wcf\system\language\LanguageFactory;
 use wcf\system\message\censorship\Censorship;
@@ -45,9 +45,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
     IMinimumLengthFormField,
     IObjectTypeFormNode
 {
-    use TInputAttributeFormField {
-        getReservedFieldAttributes as private inputGetReservedFieldAttributes;
-    }
+    use TInputAttributeFormField;
     use TMaximumLengthFormField;
     use TMinimumLengthFormField;
     use TObjectTypeFormNode;
@@ -63,6 +61,8 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
 
     /**
      * quote-related data used to create the JavaScript quote manager
+     *
+     * @var array{actionClass: string, objectType: string, selectors: array<string, string>}|null
      */
     protected ?array $quoteData = null;
 
@@ -82,13 +82,13 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
     /**
      * @inheritDoc
      */
-    protected $templateName = '__mcWysiwygFormField';
+    protected $templateName = 'shared_mcWysiwygFormField';
 
     /**
      * input processor containing the wysiwyg text
      * @var HtmlInputProcessor[]
      */
-    protected array $htmlInputProcessors;
+    protected array $htmlInputProcessors = [];
 
     protected bool $i18n = false;
 
@@ -105,21 +105,9 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param string $autosaveId identifier used to autosave field value
      * @return  WysiwygFormField|MCI18nWysiwygFormField        this field
      */
-    public function autosaveId(string $autosaveId): WysiwygFormField|self
+    public function autosaveId(string $autosaveId): WysiwygFormField | self
     {
         $this->autosaveId = $autosaveId;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     *
-     * @throws SystemException
-     */
-    public function cleanup(): static
-    {
-        MessageQuoteManager::getInstance()->saved();
 
         return $this;
     }
@@ -142,10 +130,6 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      */
     public function getFieldHtml(): string
     {
-        if ($this->supportsQuotes()) {
-            MessageQuoteManager::getInstance()->assignVariables();
-        }
-
         /** @noinspection PhpUndefinedFieldInspection */
         $disallowedBBCodesPermission = $this->getObjectType()->disallowedBBCodesPermission;
 
@@ -184,15 +168,14 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * Returns all quote data or specific quote data if an argument is given.
      *
      * @param string|null $index quote data index
-     * @return  string[]|string|null
+     * @return array<string, array<string, string>|string>|array<string, string>|string|null
      *
      * @throws  BadMethodCallException     if quotes are not supported for this field
      * @throws  InvalidArgumentException   if unknown quote data is requested
-     * @throws SystemException
      */
-    public function getQuoteData(?string $index = null): array|string|null
+    public function getQuoteData(?string $index = null): array | string | null
     {
-        if (!$this->supportQuotes()) {
+        if (!$this->supportsQuotes()) {
             throw new BadMethodCallException("Quotes are not supported for field '{$this->getId()}'.");
         }
 
@@ -227,7 +210,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param int $lastEditTime last time field has been edited
      * @return  WysiwygFormField|MCI18nWysiwygFormField    this field
      */
-    public function lastEditTime(int $lastEditTime): WysiwygFormField|self
+    public function lastEditTime(int $lastEditTime): WysiwygFormField | self
     {
         $this->lastEditTime = $lastEditTime;
 
@@ -241,8 +224,10 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * Calling this method automatically enables quote support for this field.
      *
      * @param string $objectType name of the relevant `com.woltlab.wcf.message.quote` object type
-     * @param string $actionClass action class implementing `wcf\data\IMessageQuoteAction`
-     * @param string[] $selectors selectors for the quotable content (required keys: `container`, `messageBody`, and `messageContent`)
+     * @param string $actionClass action class used for quote actions
+     * @param string[] $selectors selectors for the quotable content
+     *                            (required keys: `container`, `messageBody`, and
+     *                            `messageContent`)
      * @return  static
      *
      * @throws SystemException
@@ -263,12 +248,6 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
         if (!\class_exists($actionClass)) {
             throw new InvalidArgumentException("Unknown class '{$actionClass}' for field '{$this->getId()}'.");
         }
-        if (!\is_subclass_of($actionClass, IMessageQuoteAction::class)) {
-            throw new InvalidArgumentException(
-                "'{$actionClass}' does not implement '" . IMessageQuoteAction::class . "' for field '{$this->getId()}'."
-            );
-        }
-
         if (!empty($selectors)) {
             foreach (['container', 'messageBody', 'messageContent'] as $selector) {
                 if (!isset($selectors[$selector])) {
@@ -294,7 +273,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param bool $supportAttachments
      * @return  WysiwygFormField|MCI18nWysiwygFormField        this field
      */
-    public function supportAttachments(bool $supportAttachments = true): WysiwygFormField|self
+    public function supportAttachments(bool $supportAttachments = true): WysiwygFormField | self
     {
         $this->supportAttachments = $supportAttachments;
 
@@ -307,7 +286,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      * @param bool $supportMentions
      * @return  WysiwygFormField|MCI18nWysiwygFormField        this field
      */
-    public function supportMentions(bool $supportMentions = true): WysiwygFormField|self
+    public function supportMentions(bool $supportMentions = true): WysiwygFormField | self
     {
         $this->supportMentions = $supportMentions;
 
@@ -319,18 +298,14 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @param bool $supportQuotes
      * @return  WysiwygFormField|MCI18nWysiwygFormField        this field
-     *
-     * @throws SystemException
      */
-    public function supportQuotes(bool $supportQuotes = true): WysiwygFormField|self
+    public function supportQuotes(bool $supportQuotes = true): WysiwygFormField | self
     {
         $this->supportQuotes = $supportQuotes;
 
         if (!$this->supportsQuotes()) {
             // unset previously set quote data
             $this->quoteData = null;
-        } else {
-            MessageQuoteManager::getInstance()->readParameters();
         }
 
         return $this;
@@ -377,36 +352,36 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
         return $this->supportQuotes;
     }
 
-    /**
-     * @inheritDoc
-     * @since       5.4
-     */
-    protected static function getReservedFieldAttributes(): array
-    {
-        return \array_merge(
-            static::inputGetReservedFieldAttributes(),
-            [
-                'data-autosave',
-                'data-autosave-last-edit-time',
-                'data-disable-attachments',
-                'data-support-mention',
-            ]
-        );
-    }
-
     // custom methods below
 
     /**
      * Returns additional template variables used to generate the html representation
      * of this node.
      *
-     * @return array additional template variables
+     * @return array<string, mixed> additional template variables
      *
      * @throws SystemException
      */
     public function getHtmlVariables(): array
     {
         if ($this->isI18n()) {
+            if ($this->hasI18nValues()) {
+                $values = I18nHandler::getInstance()->getValues($this->getPrefixedId());
+                foreach ($values as $languageID => $value) {
+                    if (\is_string($value)) {
+                        $values[$languageID] = $this->upcastString($value);
+                    }
+                }
+
+                I18nHandler::getInstance()->setValues($this->getPrefixedId(), $values);
+            } elseif ($this->hasPlainValue()) {
+                I18nHandler::getInstance()->setValue(
+                    $this->getPrefixedId(),
+                    $this->upcastString(I18nHandler::getInstance()->getValue($this->getPrefixedId())),
+                    !$this->isI18nRequired()
+                );
+            }
+
             I18nHandler::getInstance()->assignVariables();
 
             return [
@@ -698,7 +673,7 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
      *
      * @throws SystemException
      */
-    public function populate(): IFormNode|self
+    public function populate(): IFormNode | self
     {
         parent::populate();
 
@@ -718,6 +693,10 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
                         } else {
                             $parameters[$this->getObjectProperty() . '_htmlInputProcessor'] = $this->htmlInputProcessor;
                         }
+                    }
+
+                    if ($this->supportsQuotes()) {
+                        MessageQuoteManager::getInstance()->saved();
                     }
 
                     return $parameters;
@@ -876,5 +855,30 @@ class MCI18nWysiwygFormField extends AbstractFormField implements
                 }
             }
         }
+    }
+
+    /**
+     * @throws SystemException
+     */
+    public function getEditorValue(): string
+    {
+        if ($this->isI18n()) {
+            $value = $this->getValue();
+            if (\is_string($value)) {
+                return $this->upcastString($value);
+            }
+
+            return '';
+        }
+
+        return $this->upcastString((string)parent::getValue());
+    }
+
+    protected function upcastString(string $value): string
+    {
+        $upcastProcessor = new HtmlUpcastProcessor();
+        $upcastProcessor->process($value, $this->getObjectType()->objectType);
+
+        return $upcastProcessor->getHtml();
     }
 }

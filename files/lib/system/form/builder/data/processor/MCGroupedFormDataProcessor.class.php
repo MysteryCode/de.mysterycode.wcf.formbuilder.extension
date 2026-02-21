@@ -47,7 +47,7 @@ class MCGroupedFormDataProcessor extends AbstractFormDataProcessor
     public function processFormData(IFormDocument $document, array $parameters): array
     {
         $container = $document->getNodeById($this->id);
-        if ($container === null || !$container->hasChildren()) {
+        if (!($container instanceof IFormContainer) || $container->children() === []) {
             if (ENABLE_DEBUG_MODE) {
                 throw new BadMethodCallException("Cannot find node with id '{$this->id}'.");
             }
@@ -62,7 +62,7 @@ class MCGroupedFormDataProcessor extends AbstractFormDataProcessor
 
     /**
      * @param IFormNode $node
-     * @param array $parameters
+     * @param array<string, mixed> $parameters
      */
     protected function processNode(IFormNode $node, array &$parameters): void
     {
@@ -89,7 +89,7 @@ class MCGroupedFormDataProcessor extends AbstractFormDataProcessor
     public function processObjectData(IFormDocument $document, array $data, IStorableObject $object): array
     {
         $container = $document->getNodeById($this->id);
-        if ($container === null || !$container->hasChildren()) {
+        if (!($container instanceof IFormContainer) || $container->children() === []) {
             if (ENABLE_DEBUG_MODE) {
                 throw new BadMethodCallException("Cannot find node with id '{$this->id}'.");
             }
@@ -107,8 +107,8 @@ class MCGroupedFormDataProcessor extends AbstractFormDataProcessor
 
     /**
      * @param    IFormNode    $node
-     * @param    array        $data
-     * @param    array        $tmpData
+     * @param    array<string, mixed> $data
+     * @param    array<string, mixed> $tmpData
      */
     protected function processNodeObject(IFormNode $node, array &$data, array $tmpData): void
     {

@@ -16,7 +16,7 @@ class MCItemListFormFieldDependency extends AbstractFormFieldDependency
     /**
      * @inheritDoc
      */
-    protected $templateName = '__mcItemListFormFieldDependency';
+    protected $templateName = 'shared_mcItemListFormFieldDependency';
 
     /**
      * @var integer
@@ -50,7 +50,8 @@ class MCItemListFormFieldDependency extends AbstractFormFieldDependency
 
     /**
      * possible values the field may have for the dependency to be met
-     * @var array|null
+     *
+     * @var list<int|string>|null
      */
     protected ?array $values = null;
 
@@ -82,24 +83,17 @@ class MCItemListFormFieldDependency extends AbstractFormFieldDependency
     /**
      * Returns the required state.
      *
-     * @return integer|null
+     * @return integer
      */
-    public function getState(): ?int
+    public function getState(): int
     {
-        if (!isset($this->state)) {
-            throw new BadMethodCallException(
-                "Required state has not been set for dependency '{$this->getId()}'"
-                . "on node '{$this->getDependentNode()->getId()}'."
-            );
-        }
-
         return $this->state;
     }
 
     /**
      * Sets the possible values the field may have for the dependency to be met.
      *
-     * @param array $values
+     * @param list<int|string> $values
      * @return static
      */
     public function values(array $values): self
@@ -112,7 +106,7 @@ class MCItemListFormFieldDependency extends AbstractFormFieldDependency
     /**
      * Returns the possible values the field may have for the dependency to be met.
      *
-     * @return array|null
+     * @return list<int|string>|null
      */
     public function getValues(): ?array
     {
@@ -152,19 +146,20 @@ class MCItemListFormFieldDependency extends AbstractFormFieldDependency
      */
     public function checkDependency(): bool
     {
+        $field = $this->getField();
         $check = false;
 
         if ($this->getState() === self::STATE_EMPTY) {
-            $check = empty($this->getField()->getValue());
+            $check = empty($field->getValue());
         } elseif ($this->getState() === self::STATE_NON_EMPTY) {
-            $check = !empty($this->getField()->getValue());
+            $check = !empty($field->getValue());
             $values = $this->getValues();
 
             if ($values !== null && $check) {
-                if (\is_array($this->getField()->getValue())) {
+                if (\is_array($field->getValue())) {
                     // do not use `array_diff` because we use weak comparison
                     foreach ($this->getValues() as $possibleValue) {
-                        foreach ($this->getField()->getValue() as $actualValue) {
+                        foreach ($field->getValue() as $actualValue) {
                             /** @noinspection TypeUnsafeComparisonInspection */
                             if ($possibleValue == $actualValue) {
                                 $check = true;
@@ -173,7 +168,7 @@ class MCItemListFormFieldDependency extends AbstractFormFieldDependency
                         }
                     }
                 } else {
-                    $check = \in_array($this->getField()->getValue(), $this->getValues(), false);
+                    $check = \in_array($field->getValue(), $this->getValues(), false);
                 }
 
                 if ($this->isNegated()) {

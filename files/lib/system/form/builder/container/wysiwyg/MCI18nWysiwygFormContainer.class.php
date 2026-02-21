@@ -12,14 +12,15 @@ use wcf\system\exception\SystemException;
 use wcf\system\form\builder\button\wysiwyg\WysiwygPreviewFormButton;
 use wcf\system\form\builder\container\FormContainer;
 use wcf\system\form\builder\container\IFormContainer;
-use wcf\system\form\builder\container\TabFormContainer;
 use wcf\system\form\builder\field\TMaximumLengthFormField;
 use wcf\system\form\builder\field\TMinimumLengthFormField;
 use wcf\system\form\builder\field\wysiwyg\MCI18nWysiwygFormField;
-use wcf\system\form\builder\field\wysiwyg\MCWysiwygAttachmentFormField;
+use wcf\system\form\builder\field\wysiwyg\WysiwygAttachmentFormField;
 use wcf\system\form\builder\IFormChildNode;
+use wcf\system\form\builder\Psr15DialogForm;
 use wcf\system\form\builder\TWysiwygFormNode;
 use wcf\system\Regex;
+use wcf\system\style\FontAwesomeIcon;
 
 use const MODULE_SMILEY;
 
@@ -35,32 +36,38 @@ class MCI18nWysiwygFormContainer extends FormContainer
     use TMinimumLengthFormField;
     use TWysiwygFormNode;
 
-    protected MCWysiwygAttachmentFormField $attachmentField;
+    protected WysiwygAttachmentFormField $attachmentField;
 
     /**
      * attachment-related data used to create an `AttachmentHandler` object for the attachment
      * form field
+     *
+     * @var array{objectType: string, parentObjectID: int}|null
      */
-    protected array $attachmentData;
+    protected ?array $attachmentData = null;
 
     protected bool $enablePreviewButton = true;
 
-    protected string $messageObjectType;
+    protected string $messageObjectType = '';
 
-    protected int $objectId;
+    protected int $objectId = 0;
 
     protected string $preselect = 'true';
 
-    protected string $pollObjectType;
+    protected ?string $pollObjectType = null;
 
     protected FormContainer $settingsContainer;
 
     protected WysiwygPollFormContainer $pollContainer;
 
+    protected WysiwygQuoteFormContainer $quoteContainer;
+
     /**
      * quote-related data used to create the JavaScript quote manager
+     *
+     * @var array{actionClass: string, objectType: string, selectors: array<string, string>}|null
      */
-    protected ?array $quoteData;
+    protected ?array $quoteData = null;
 
     protected bool $required = false;
 
@@ -89,7 +96,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * pattern for the language item used to save the i18n values
      */
-    protected ?string $languageItemPattern;
+    protected ?string $languageItemPattern = null;
 
     /**
      * @inheritDoc
@@ -151,7 +158,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
         }
 
         if ($objectType === null) {
-            $this->attachmentData = [];
+            $this->attachmentData = null;
         } else {
             if (
                 ObjectTypeCache::getInstance()->getObjectTypeByName(
@@ -184,7 +191,8 @@ class MCI18nWysiwygFormContainer extends FormContainer
     {
         if ($this->isPopulated) {
             throw new BadMethodCallException(
-                "Enabling and disabling the preview button is only possible before the form has been built for container '{$this->getId()}'."
+                "Enabling and disabling the preview button is only possible before the form "
+                . "has been built for container '{$this->getId()}'."
             );
         }
 
@@ -196,13 +204,15 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Returns the form field handling attachments.
      *
-     * @throws  BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
+     * @throws BadMethodCallException if the form field container has not been populated yet /
+     *                                form has not been built yet
      */
-    public function getAttachmentField(): MCWysiwygAttachmentFormField
+    public function getAttachmentField(): WysiwygAttachmentFormField
     {
         if (!isset($this->attachmentField)) {
             throw new BadMethodCallException(
-                "Wysiwyg form field can only be requested after the form has been built for container '{$this->getId()}'."
+                "Wysiwyg form field can only be requested after the form has been built for "
+                . "container '{$this->getId()}'."
             );
         }
 
@@ -231,13 +241,15 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Returns the wysiwyg form container with all poll-related fields.
      *
-     * @throws  BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
+     * @throws BadMethodCallException if the form field container has not been populated yet /
+     *                                form has not been built yet
      */
     public function getPollContainer(): WysiwygPollFormContainer
     {
         if (!isset($this->pollContainer)) {
             throw new BadMethodCallException(
-                "Wysiwyg form field can only be requested after the form has been built for container '{$this->getId()}'."
+                "Wysiwyg form field can only be requested after the form has been built for "
+                . "container '{$this->getId()}'."
             );
         }
 
@@ -247,13 +259,15 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Returns the form container for all settings-related fields.
      *
-     * @throws  BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
+     * @throws BadMethodCallException if the form field container has not been populated yet /
+     *                                form has not been built yet
      */
     public function getSettingsContainer(): FormContainer
     {
         if (!isset($this->settingsContainer)) {
             throw new BadMethodCallException(
-                "Wysiwyg form field can only be requested after the form has been built for container '{$this->getId()}'."
+                "Wysiwyg form field can only be requested after the form has been built for "
+                . "container '{$this->getId()}'."
             );
         }
 
@@ -263,13 +277,15 @@ class MCI18nWysiwygFormContainer extends FormContainer
     /**
      * Returns the form container for smiley categories.
      *
-     * @throws  BadMethodCallException     if the form field container has not been populated yet/form has not been built yet
+     * @throws BadMethodCallException if the form field container has not been populated yet /
+     *                                form has not been built yet
      */
     public function getSmiliesContainer(): WysiwygSmileyFormContainer
     {
         if (!isset($this->smiliesContainer)) {
             throw new BadMethodCallException(
-                "Smilies form field container can only be requested after the form has been built for container '{$this->getId()}'."
+                "Smilies form field container can only be requested after the form has been built "
+                . "for container '{$this->getId()}'."
             );
         }
 
@@ -346,8 +362,11 @@ class MCI18nWysiwygFormContainer extends FormContainer
      *
      * @throws SystemException
      */
-    public function updatedObject(array $data, IStorableObject $object, $loadValues = true): FormContainer|IFormContainer
-    {
+    public function updatedObject(
+        array $data,
+        IStorableObject $object,
+        $loadValues = true
+    ): FormContainer | IFormContainer {
         $this->objectId = $object->{$object::getDatabaseTableIndexName()};
 
         $this->setAttachmentHandler();
@@ -398,8 +417,10 @@ class MCI18nWysiwygFormContainer extends FormContainer
      * Calling this method automatically enables quote support for this container.
      *
      * @param string $objectType name of the relevant `com.woltlab.wcf.message.quote` object type
-     * @param string $actionClass action class implementing `wcf\data\IMessageQuoteAction`
-     * @param string[] $selectors selectors for the quotable content (required keys: `container`, `messageBody`, and `messageContent`)
+     * @param string $actionClass action class used for quote actions
+     * @param string[] $selectors selectors for the quotable content
+     *                            (required keys: `container`, `messageBody`, and
+     *                            `messageContent`)
      * @return static
      *
      * @throws SystemException
@@ -439,7 +460,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
      */
     protected function setAttachmentHandler(): void
     {
-        if (isset($this->attachmentData)) {
+        if ($this->attachmentData !== null) {
             $this->attachmentField->attachmentHandler(
                 new AttachmentHandler(
                     $this->attachmentData['objectType'],
@@ -471,15 +492,17 @@ class MCI18nWysiwygFormContainer extends FormContainer
      * Sets if quotes are supported by the editor field and returns this form container.
      *
      * By default, quotes are not supported.
-     *
-     * @throws SystemException
      */
     public function supportQuotes(bool $supportQuotes = true): static
     {
+        $this->supportQuotes = $supportQuotes;
+
+        if (isset($this->quoteContainer)) {
+            $this->quoteContainer->available($supportQuotes);
+        }
+
         if (isset($this->wysiwygField)) {
             $this->wysiwygField->supportQuotes($supportQuotes);
-        } else {
-            $this->supportQuotes = $supportQuotes;
         }
 
         return $this;
@@ -514,7 +537,8 @@ class MCI18nWysiwygFormContainer extends FormContainer
     {
         if (!isset($this->wysiwygField)) {
             throw new BadMethodCallException(
-                "Wysiwyg form field can only be requested after the form has been built for container '{$this->getId()}'."
+                "Wysiwyg form field can only be requested after the form has been built for "
+                . "container '{$this->getId()}'."
             );
         }
 
@@ -526,7 +550,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
      *
      * @throws SystemException
      */
-    public function populate(): void
+    public function populate(): static
     {
         parent::populate();
 
@@ -535,7 +559,7 @@ class MCI18nWysiwygFormContainer extends FormContainer
             ->minimumLength($this->getMinimumLength())
             ->maximumLength($this->getMaximumLength())
             ->required($this->isRequired())
-            ->supportAttachments(isset($this->attachmentData))
+            ->supportAttachments($this->attachmentData !== null)
             ->supportMentions($this->supportMentions)
             ->supportQuotes($this->supportQuotes)
             ->i18n($this->isI18n())
@@ -549,19 +573,25 @@ class MCI18nWysiwygFormContainer extends FormContainer
                 $this->quoteData['selectors']
             );
         }
+
         $this->smiliesContainer = WysiwygSmileyFormContainer::create($this->wysiwygId . 'SmiliesTab')
             ->wysiwygId($this->getWysiwygId())
             ->label('wcf.message.smilies')
             ->available($this->supportSmilies);
-        $this->attachmentField = MCWysiwygAttachmentFormField::create($this->wysiwygId . 'Attachments')
+        $this->attachmentField = WysiwygAttachmentFormField::create($this->wysiwygId . 'Attachments')
             ->wysiwygId($this->getWysiwygId());
         $this->settingsContainer = FormContainer::create($this->wysiwygId . 'SettingsContainer')
             ->appendChildren($this->settingsNodes);
         $this->pollContainer = WysiwygPollFormContainer::create($this->wysiwygId . 'PollContainer')
             ->wysiwygId($this->getWysiwygId());
-        if (isset($this->pollObjectType)) {
+
+        if ($this->pollObjectType !== null) {
             $this->pollContainer->objectType($this->pollObjectType);
         }
+
+        $this->quoteContainer = WysiwygQuoteFormContainer::create($this->wysiwygId . 'QuoteContainer')
+            ->wysiwygId($this->getWysiwygId())
+            ->available($this->supportQuotes);
 
         $this->appendChildren([
             $this->wysiwygField,
@@ -572,29 +602,41 @@ class MCI18nWysiwygFormContainer extends FormContainer
                 ->appendChildren([
                     $this->smiliesContainer,
 
-                    TabFormContainer::create($this->wysiwygId . 'AttachmentsTab')
+                    WysiwygTabFormContainer::create($this->wysiwygId . 'AttachmentsTab')
                         ->addClass('formAttachmentContent')
                         ->label('wcf.attachment.attachments')
+                        ->name('attachments')
+                        ->icon(FontAwesomeIcon::fromValues('paperclip'))
+                        ->wysiwygId($this->getWysiwygId())
                         ->appendChild(
                             FormContainer::create($this->wysiwygId . 'AttachmentsContainer')
                                 ->appendChild($this->attachmentField)
                         ),
 
-                    TabFormContainer::create($this->wysiwygId . 'SettingsTab')
+                    WysiwygTabFormContainer::create($this->wysiwygId . 'SettingsTab')
                         ->label('wcf.message.settings')
+                        ->name('settings')
+                        ->icon(FontAwesomeIcon::fromValues('gear'))
+                        ->wysiwygId($this->getWysiwygId())
                         ->appendChild($this->settingsContainer),
 
-                    TabFormContainer::create($this->wysiwygId . 'PollTab')
+                    WysiwygTabFormContainer::create($this->wysiwygId . 'PollTab')
                         ->label('wcf.poll.management')
+                        ->name('poll')
+                        ->icon(FontAwesomeIcon::fromValues('chart-bar'))
+                        ->wysiwygId($this->getWysiwygId())
                         ->appendChild($this->pollContainer),
+
+                    $this->quoteContainer,
                 ]),
         ]);
 
-        if (isset($this->attachmentData)) {
+        if ($this->attachmentData !== null) {
             $this->setAttachmentHandler();
         }
+        $this->wysiwygField->supportAttachments($this->attachmentField->isAvailable());
 
-        if ($this->enablePreviewButton) {
+        if ($this->enablePreviewButton && !($this->getDocument() instanceof Psr15DialogForm)) {
             $this->getDocument()->addButton(
                 WysiwygPreviewFormButton::create($this->getWysiwygId() . 'PreviewButton')
                     ->objectType($this->messageObjectType)
@@ -604,6 +646,8 @@ class MCI18nWysiwygFormContainer extends FormContainer
         }
 
         EventHandler::getInstance()->fireAction($this, 'populate');
+
+        return $this;
     }
 
     /**

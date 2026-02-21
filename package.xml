@@ -1,38 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package name="de.mysterycode.wcf.formbuilder.extension" xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com https://www.woltlab.com/XSD/5.4/package.xsd">
+<package xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com https://www.woltlab.com/XSD/6.0/package.xsd" name="de.mysterycode.wcf.formbuilder.extension">
 	<packageinformation>
 		<packagename><![CDATA[Form Builder: Extension]]></packagename>
 		<packagename language="de"><![CDATA[Form Builder: Erweiterung]]></packagename>
+		<packagename language="cs"><![CDATA[Tvůrce formulářů: Rozšíření]]></packagename>
+		<packagename language="da"><![CDATA[Formularbygger: Udvidelse]]></packagename>
+		<packagename language="es"><![CDATA[Constructor de formularios: Extensión]]></packagename>
+		<packagename language="fr"><![CDATA[Constructeur de formulaires : Extension]]></packagename>
+		<packagename language="hu"><![CDATA[Űrlapkészítő: Kiegészítő]]></packagename>
+		<packagename language="it"><![CDATA[Generatore di moduli: Estensione]]></packagename>
+		<packagename language="nl"><![CDATA[Formulierbouwer: Uitbreiding]]></packagename>
+		<packagename language="no"><![CDATA[Skjemabygger: Utvidelse]]></packagename>
+		<packagename language="pl"><![CDATA[Kreator formularzy: Rozszerzenie]]></packagename>
+		<packagename language="ro"><![CDATA[Constructor de formulare: Extensie]]></packagename>
+		<packagename language="ru"><![CDATA[Конструктор форм: Расширение]]></packagename>
+		<packagename language="sv"><![CDATA[Formulärbyggare: Tillägg]]></packagename>
+		<packagename language="tr"><![CDATA[Form Oluşturucu: Eklenti]]></packagename>
+
 		<packagedescription><![CDATA[Extension for the form builder API.]]></packagedescription>
 		<packagedescription language="de"><![CDATA[Erweiterung für die Form Builder-API.]]></packagedescription>
-		<version>1.4.1</version>
-		<date><![CDATA[2024-10-05]]></date>
+		<packagedescription language="cs"><![CDATA[Rozšíření pro API tvůrce formulářů.]]></packagedescription>
+		<packagedescription language="da"><![CDATA[Udvidelse til formularbygger-API'et.]]></packagedescription>
+		<packagedescription language="es"><![CDATA[Extensión para la API del constructor de formularios.]]></packagedescription>
+		<packagedescription language="fr"><![CDATA[Extension pour l'API du constructeur de formulaires.]]></packagedescription>
+		<packagedescription language="hu"><![CDATA[Kiegészítő az űrlapkészítő API-jához.]]></packagedescription>
+		<packagedescription language="it"><![CDATA[Estensione per l'API del generatore di moduli.]]></packagedescription>
+		<packagedescription language="nl"><![CDATA[Uitbreiding voor de formulierbouwer-API.]]></packagedescription>
+		<packagedescription language="no"><![CDATA[Utvidelse for skjemabygger-API-et.]]></packagedescription>
+		<packagedescription language="pl"><![CDATA[Rozszerzenie dla API kreatora formularzy.]]></packagedescription>
+		<packagedescription language="ro"><![CDATA[Extensie pentru API-ul constructorului de formulare.]]></packagedescription>
+		<packagedescription language="ru"><![CDATA[Расширение для API конструктора форм.]]></packagedescription>
+		<packagedescription language="sv"><![CDATA[Tillägg för formulärbyggarens API.]]></packagedescription>
+		<packagedescription language="tr"><![CDATA[Form oluşturucu API'si için eklenti.]]></packagedescription>
+
+		<packageurl><![CDATA[https://softcreatr.dev/shop/product/155]]></packageurl>
+		<version>1.5.0</version>
+		<date><![CDATA[2026-02-21]]></date>
         <license><![CDATA[Lesser General Public License (LGPL)]]></license>
 	</packageinformation>
 
 	<authorinformation>
-		<author><![CDATA[Florian Gail]]></author>
-		<authorurl><![CDATA[https://www.mysterycode.de]]></authorurl>
+		<author><![CDATA[SoftCreatR.dev]]></author>
+		<authorurl><![CDATA[https://softcreatr.dev]]></authorurl>
 	</authorinformation>
 
 	<requiredpackages>
-		<requiredpackage minversion="6.0.16"><![CDATA[com.woltlab.wcf]]></requiredpackage>
+		<requiredpackage minversion="6.2.0"><![CDATA[com.woltlab.wcf]]></requiredpackage>
 	</requiredpackages>
 
 	<excludedpackages>
-		<excludedpackage version="6.2.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></excludedpackage>
+		<excludedpackage version="6.3.0 Alpha 1"><![CDATA[com.woltlab.wcf]]></excludedpackage>
 	</excludedpackages>
-	
+
 	<instructions type="install">
 		<instruction type="file"/>
-		<instruction type="acpTemplate"/>
 		<instruction type="template"/>
 	</instructions>
 
-	<instructions type="update" fromversion="*">
+	<instructions type="update" fromversion="1.4.*">
 		<instruction type="file"/>
-		<instruction type="acpTemplate"/>
 		<instruction type="template"/>
+		<instruction type="acpTemplateDelete"/>
 		<instruction type="fileDelete"/>
+		<instruction type="templateDelete"/>
 	</instructions>
 </package>

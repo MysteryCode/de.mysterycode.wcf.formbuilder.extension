@@ -17,8 +17,8 @@ enum State {
 
 export class ItemList extends Abstract {
   protected _values: string[] | number[] | null = null;
-  protected _state: State;
-  protected _isNegated: boolean;
+  protected _state: State = State.NonEmpty;
+  protected _isNegated: boolean = false;
 
   /**
    * Sets if the field value may not have any of the set values.
@@ -32,7 +32,7 @@ export class ItemList extends Abstract {
   /**
    * Sets the possible values the field may have for the dependency to be met.
    */
-  values(values: string[] | number[]): ItemList {
+  values(values: string[] | number[] | null): ItemList {
     this._values = values;
 
     return this;
@@ -41,45 +41,41 @@ export class ItemList extends Abstract {
   /**
    * Sets the state of the dependency-field to be met.
    */
-  state(state: number): ItemList {
+  state(state: State): ItemList {
     this._state = state;
 
     return this;
   }
 
   public checkDependency(): boolean {
-    if (this._field !== null) {
-      if (DependencyManager.isHiddenByDependencies(this._field)) {
-        return false;
-      }
-
-      const values: ItemData[] = UiItemList.getValues(this._field.id);
-
-      if (this._state === State.Empty) {
-        return values.length === 0;
-      } else if (this._state === State.NonEmpty) {
-        if (values.length < 1) {
-          return false;
-        }
-
-        if (this._values !== null) {
-          let foundMatch = false;
-          this._values.forEach((value) => {
-            values.forEach((selectedValue) => {
-              if (value == selectedValue) {
-                foundMatch = true;
-              }
-            });
-          });
-
-          return this._isNegated ? !foundMatch : foundMatch;
-        }
-
-        return true;
-      }
+    if (this._field === null || DependencyManager.isHiddenByDependencies(this._field)) {
+      return false;
     }
 
-    return false;
+    const values: ItemData[] = UiItemList.getValues(this._field.id);
+
+    if (this._state === State.Empty) {
+      return values.length === 0;
+    }
+
+    if (this._state !== State.NonEmpty || values.length === 0) {
+      return false;
+    }
+
+    if (this._values === null) {
+      return true;
+    }
+
+    const selectedValues = new Set<string>();
+
+    values.forEach((selectedValue) => {
+      selectedValues.add(String(selectedValue.value));
+      selectedValues.add(String(selectedValue.objectId));
+    });
+
+    const foundMatch = this._values.some((value) => selectedValues.has(String(value)));
+
+    return this._isNegated ? !foundMatch : foundMatch;
   }
 }
 

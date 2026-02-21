@@ -17,13 +17,12 @@ class MCDummyFormContainer extends FormContainer
      */
     public function getHtml(): string
     {
-        return WCF::getTPL()->fetch(
-            '__formContainerChildren',
+        return WCF::getTPL()->render(
             'wcf',
+            'shared_formContainerChildren',
             \array_merge($this->getHtmlVariables(), [
                 'container' => $this,
-            ]),
-            true
+            ])
         );
     }
 }

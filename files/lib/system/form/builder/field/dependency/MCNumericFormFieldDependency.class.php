@@ -15,7 +15,7 @@ class MCNumericFormFieldDependency extends AbstractFormFieldDependency
     /**
      * @inheritDoc
      */
-    protected $templateName = '__mcNumericFormFieldDependency';
+    protected $templateName = 'shared_mcNumericFormFieldDependency';
 
     /**
      * @var string
@@ -25,10 +25,10 @@ class MCNumericFormFieldDependency extends AbstractFormFieldDependency
     /**
      * @var int|float
      */
-    protected int|float $referenceValue;
+    protected int | float $referenceValue;
 
     /**
-     * @var string
+     * @var string[]
      */
     public const AVAILABLE_OPERATORS = ['<', '<=', '>', '>=', '==', '==='];
 
@@ -56,7 +56,7 @@ class MCNumericFormFieldDependency extends AbstractFormFieldDependency
      * @param float|integer $value
      * @return MCNumericFormFieldDependency
      */
-    public function referenceValue(float|int $value): self
+    public function referenceValue(float | int $value): self
     {
         $this->referenceValue = $value;
 
@@ -66,7 +66,7 @@ class MCNumericFormFieldDependency extends AbstractFormFieldDependency
     /**
      * @return int|float
      */
-    public function getReferenceValue(): float|int
+    public function getReferenceValue(): float | int
     {
         return $this->referenceValue;
     }

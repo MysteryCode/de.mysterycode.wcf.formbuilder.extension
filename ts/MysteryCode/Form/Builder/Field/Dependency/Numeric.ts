@@ -7,9 +7,20 @@
 
 import Abstract from "WoltLabSuite/Core/Form/Builder/Field/Dependency/Abstract";
 
+type Operator = ">" | ">=" | "<" | "<=" | "==" | "===";
+
+const comparison: Record<Operator, (a: number, b: number) => boolean> = {
+  ">": (a, b) => a > b,
+  ">=": (a, b) => a >= b,
+  "<": (a, b) => a < b,
+  "<=": (a, b) => a <= b,
+  "==": (a, b) => a === b,
+  "===": (a, b) => a === b,
+};
+
 export class Numeric extends Abstract {
   protected _referenceValue: number | null = null;
-  protected _operator: string | null = null;
+  protected _operator: Operator | null = null;
 
   referenceValue(referenceValue: number): Numeric {
     this._referenceValue = referenceValue;
@@ -17,7 +28,7 @@ export class Numeric extends Abstract {
     return this;
   }
 
-  operator(operator: string): Numeric {
+  operator(operator: Operator): Numeric {
     this._operator = operator;
 
     return this;
@@ -27,40 +38,21 @@ export class Numeric extends Abstract {
     if (this._referenceValue === null) {
       throw new Error("Value has not been set.");
     }
+
     if (this._operator === null) {
       throw new Error("Operator has not been set.");
     }
 
-    const comparison = {
-      ">": (a: number, b: number) => {
-        return a > b;
-      },
-      ">=": (a: number, b: number) => {
-        return a >= b;
-      },
-      "<": (a: number, b: number) => {
-        return a < b;
-      },
-      "<=": (a: number, b: number) => {
-        return a <= b;
-      },
-      "==": (a: number, b: number) => {
-        return a == b;
-      },
-      "===": (a: number, b: number) => {
-        return a === b;
-      },
-    };
-
-    if (this._field) {
-      const field = this._field as HTMLInputElement;
-      if (field.value === "") {
-        return false;
-      }
-
-      return comparison[this._operator](field.value, this._referenceValue);
+    if (!(this._field instanceof HTMLInputElement) || this._field.value === "") {
+      return false;
     }
 
-    return false;
+    const value = Number.parseFloat(this._field.value);
+
+    if (Number.isNaN(value)) {
+      return false;
+    }
+
+    return comparison[this._operator](value, this._referenceValue);
   }
 }

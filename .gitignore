@@ -1,0 +1,86 @@
+# ===============================
+# Ignoring files in files/lib/system/api/
+# ===============================
+
+# Ignore all files and subdirectories in files/lib/system/api/
+files*/lib/system/api/**
+
+# Ensure that the directories themselves are not ignored
+!files*/lib/system/api/
+!files*/lib/system/api/**/
+
+# Ignore specific subdirectories
+files*/lib/system/api/**/test/
+files*/lib/system/api/**/tests/
+files*/lib/system/api/**/doc/
+files*/lib/system/api/**/docs/
+
+# Include all .php files as well as composer.json and composer.lock
+!files*/lib/system/api/**/*.php
+!files*/lib/system/api/**/composer.json
+!files*/lib/system/api/**/composer.lock
+
+# ===============================
+# General Ignoring Rules
+# ===============================
+
+# Node modules
+node_modules/
+
+# Logs
+/log/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+/cache/
+*.cache
+*.tmp
+
+# macOS-specific files
+.DS_Store
+
+# Windows-specific files
+Thumbs.db
+ehthumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.swp
+
+# IDE-specific files (examples for various editors)
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Other temporary files
+*.temp
+
+# PaxHeader directories (if applicable)
+PaxHeader/
+
+# ===============================
+# Additional Specific Ignoring Rules
+# ===============================
+
+.phpstorm.meta.php
+
+# Ignore environment variable files
+.env
+.env.local
+.env.*.local
+
+# Ignore build directories
+/build/
+dist/
+public/build/
+
+# Ignore test reports and coverage
+coverage/
+*.lcov
+
+.phpstan-cache

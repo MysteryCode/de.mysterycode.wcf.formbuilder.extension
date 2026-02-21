@@ -9,25 +9,29 @@ use wcf\data\object\type\ObjectTypeCache;
 use wcf\system\attachment\AttachmentHandler;
 use wcf\system\event\EventHandler;
 use wcf\system\exception\SystemException;
-use wcf\system\form\builder\field\MCAttachmentFormField;
+use wcf\system\form\builder\field\wysiwyg\WysiwygAttachmentFormField;
 
 /**
  * Container providing the possibility to upload attachments without the need of a wysiwyg-editor
  *
  * @author      Florian Gail
  * @copyright   Florian Gail; 2018 - 2022; <https://www.mysterycode.de>
+ *
+ * @deprecated 1.5 Use `FormContainer` with `WysiwygAttachmentFormField` or `FileProcessorFormField` instead.
  */
 class MCAttachmentFormContainer extends FormContainer
 {
     /**
      * attachment form field
      */
-    protected ?MCAttachmentFormField $attachmentField = null;
+    protected ?WysiwygAttachmentFormField $attachmentField = null;
 
     /**
      * attachment-related data used to create an `AttachmentHandler` object for the attachment form field
+     *
+     * @var array{objectType: string, parentObjectID: int}|null
      */
-    protected ?array $attachmentData;
+    protected ?array $attachmentData = null;
 
     /**
      * id of the edited object
@@ -37,7 +41,7 @@ class MCAttachmentFormContainer extends FormContainer
     /**
      * id of the field itself
      */
-    protected int $fieldId = 0;
+    protected string $fieldId = '';
 
     /**
      * @inheritDoc
@@ -96,9 +100,9 @@ class MCAttachmentFormContainer extends FormContainer
     /**
      * Returns the form field handling attachments.
      *
-     * @return MCAttachmentFormField|null
+     * @return WysiwygAttachmentFormField|null
      */
-    public function getAttachmentField(): ?MCAttachmentFormField
+    public function getAttachmentField(): ?WysiwygAttachmentFormField
     {
         if (empty($this->attachmentField)) {
             throw new BadMethodCallException(
@@ -124,16 +128,19 @@ class MCAttachmentFormContainer extends FormContainer
      */
     public function id($id): self
     {
-        $this->fieldId = $id;
+        $this->fieldId = (string)$id;
 
-        return parent::id($id . 'Container');
+        return parent::id($this->fieldId . 'Container');
     }
 
     /**
      * @throws SystemException
      */
-    public function loadValues(array $data, IStorableObject $object)
-    {
+    public function updatedObject(
+        array $data,
+        IStorableObject $object,
+        $loadValues = true
+    ): self | FormContainer {
         $this->objectId = $object->{$object::getDatabaseTableIndexName()};
 
         if ($this->attachmentData !== null) {
@@ -148,7 +155,7 @@ class MCAttachmentFormContainer extends FormContainer
             );
         }
 
-        return parent::loadValues($data, $object);
+        return parent::updatedObject($data, $object, $loadValues);
     }
 
     /**
@@ -156,11 +163,12 @@ class MCAttachmentFormContainer extends FormContainer
      *
      * @throws SystemException
      */
-    public function populate(): void
+    public function populate(): static
     {
         parent::populate();
 
-        $this->attachmentField = MCAttachmentFormField::create($this->fieldId);
+        $this->attachmentField = WysiwygAttachmentFormField::create($this->fieldId)
+            ->wysiwygId($this->fieldId);
 
         $this->appendChildren([
             $this->attachmentField,
@@ -180,5 +188,7 @@ class MCAttachmentFormContainer extends FormContainer
         }
 
         EventHandler::getInstance()->fireAction($this, 'populate');
+
+        return $this;
     }
 }

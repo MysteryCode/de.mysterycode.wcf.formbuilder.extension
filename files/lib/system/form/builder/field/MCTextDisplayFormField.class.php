@@ -13,7 +13,7 @@ class MCTextDisplayFormField extends AbstractFormField
     /**
      * @inheritDoc
      */
-    protected $templateName = '__mcTextDisplayFormField';
+    protected $templateName = 'shared_mcTextDisplayFormField';
 
     /**
      * Displayed text
@@ -32,7 +32,7 @@ class MCTextDisplayFormField extends AbstractFormField
     /**
      * @inheritDoc
      */
-    public function readValue(): IFormField|self
+    public function readValue(): IFormField | self
     {
         return $this;
     }

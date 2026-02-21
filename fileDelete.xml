@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<data xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com https://www.woltlab.com/XSD/5.4/fileDelete.xsd">
+<data xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/6.0/fileDelete.xsd">
     <delete>
         <file>acp/update_de.mysterycode.wcf.formBuilder.extension.php</file>
         <file>lib/system/form/builder/data/processor/MCRecurringElementsFormDataProcessor.class.php</file>
@@ -7,5 +7,10 @@
         <file>lib/system/form/builder/container/MCRecurringElementsFormContainer.class.php</file>
         <file>lib/system/form/builder/container/MCRegisterFormContainer.class.php</file>
         <file>lib/data/TI18nDatabaseObjectAction.class.php</file>
+        <file>lib/system/form/builder/field/MCPreviewedUploadFormField.class.php</file>
+        <file>js/MysteryCode/Form/Builder/LabelPreviewHandler.js</file>
+        <file>js/MysteryCode/Form/Builder/Field/Wysiwyg/Attachment.js</file>
+        <file>js/MysteryCode/Ui/Attachment/Upload.js</file>
+        <file>js/MysteryCode/Ui/Attachment/UploadData.js</file>
     </delete>
 </data>
